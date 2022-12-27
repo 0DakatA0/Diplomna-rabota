@@ -5,6 +5,7 @@
     <string name="username">Username</string>
     <string name="email">Email</string>
     <string name="password">Password</string>
+    <string name="sign_up">Sign Up</string>
     <string-array name="user_types">
         <item>User</item>
         <item>Gym Owner</item>
