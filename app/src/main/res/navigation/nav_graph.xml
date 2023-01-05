@@ -1,0 +1,42 @@
+<?xml version="1.0" encoding="utf-8"?>
+<navigation xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:id="@+id/nav_graph">
+
+    <fragment
+        android:id="@+id/logInFragment"
+        android:label="fragment_log_in"
+        tools:layout="@layout/fragment_log_in">
+        <action
+            android:id="@+id/action_logInFragment_to_signUpFragment"
+            app:destination="@id/signUpFragment" />
+        <action
+            android:id="@+id/action_logInFragment_to_gymsFragment"
+            app:destination="@id/gymsFragment" />
+    </fragment>
+
+    <fragment
+        android:id="@+id/signUpFragment"
+        android:label="fragment_sign_up"
+        tools:layout="@layout/fragment_sign_up">
+        <action
+            android:id="@+id/action_signUpFragment_to_gymsFragment"
+            app:destination="@id/gymsFragment" />
+    </fragment>
+
+    <fragment
+        android:id="@+id/gymsFragment"
+        android:label="fragment_gyms"
+        tools:layout="@layout/fragment_gyms">
+        <action
+            android:id="@+id/action_gymsFragment_to_gymEditFragment"
+            app:destination="@id/gymEditFragment" />
+    </fragment>
+
+    <fragment
+        android:id="@+id/gymEditFragment"
+        android:label="fragment_gym_edit"
+        tools:layout="@layout/fragment_gym_edit">
+    </fragment>
+</navigation>
