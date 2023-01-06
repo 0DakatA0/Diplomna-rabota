@@ -45,6 +45,7 @@
                     android:layout_height="wrap_content"
                     android:layout_marginHorizontal="40dp"
                     android:layout_marginVertical="20dp"
+                    android:id="@+id/logInButton"
                     android:text="@string/log_in" />
 
                 <LinearLayout
@@ -63,7 +64,9 @@
                             android:text=" Sign in!"
                             android:textColor="@color/design_default_color_primary"
                             android:clickable="true"
-                            android:focusable="true" />
+                            android:focusable="true"
+                            android:id="@+id/goToSignUpText"
+                            />
                 </LinearLayout>
         </LinearLayout>
 </androidx.constraintlayout.widget.ConstraintLayout>
