@@ -8,7 +8,7 @@
     <fragment
         android:id="@+id/logInFragment"
         android:label="Log In"
-        android:name="org.elsys.healthmap.ui.LogInFragment"
+        android:name="org.elsys.healthmap.ui.authentication.LogInFragment"
         tools:layout="@layout/fragment_log_in">
         <action
             android:id="@+id/action_logInFragment_to_signUpFragment"
@@ -21,7 +21,7 @@
     <fragment
         android:id="@+id/signUpFragment"
         android:label="Sign Up"
-        android:name="org.elsys.healthmap.ui.SignUpFragment"
+        android:name="org.elsys.healthmap.ui.authentication.SignUpFragment"
         tools:layout="@layout/fragment_sign_up">
         <action
             android:id="@+id/action_signUpFragment_to_gymsFragment"
@@ -31,7 +31,7 @@
     <fragment
         android:id="@+id/gymsFragment"
         android:label="Gyms"
-        android:name="org.elsys.healthmap.ui.GymsFragment"
+        android:name="org.elsys.healthmap.ui.gym.GymsFragment"
         tools:layout="@layout/fragment_gyms">
         <action
             android:id="@+id/action_gymsFragment_to_gymEditFragment"
@@ -41,7 +41,7 @@
     <fragment
         android:id="@+id/gymEditFragment"
         android:label="Edit Gym"
-        android:name="org.elsys.healthmap.ui.GymEditFragment"
+        android:name="org.elsys.healthmap.ui.gym.GymEditFragment"
         tools:layout="@layout/fragment_gym_edit">
     </fragment>
 </navigation>

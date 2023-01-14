@@ -1,4 +1,4 @@
-package org.elsys.healthmap.ui
+package org.elsys.healthmap.ui.authentication
 
 import android.os.Bundle
 import android.view.LayoutInflater
