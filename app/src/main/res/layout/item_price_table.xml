@@ -10,7 +10,7 @@
         android:layout_weight="1"
         android:layout_width="0dp"
         android:layout_height="wrap_content"
-        app:cardBackgroundColor="#e986eb"
+        app:cardBackgroundColor="@color/design_default_color_primary"
         app:cardCornerRadius="20dp"
         app:cardElevation="10dp"
         app:cardMaxElevation="12dp"
@@ -22,7 +22,8 @@
             android:layout_height="wrap_content"
             android:gravity="center"
             android:minLines="3"
-            android:text="Product" />
+            android:text="Product"
+            android:textColor="@color/design_default_color_on_primary"/>
     </androidx.cardview.widget.CardView>
 
     <androidx.cardview.widget.CardView
@@ -30,7 +31,7 @@
         android:layout_weight="1"
         android:layout_width="0dp"
         android:layout_height="wrap_content"
-        app:cardBackgroundColor="#e986eb"
+        app:cardBackgroundColor="@color/design_default_color_primary"
         app:cardCornerRadius="20dp"
         app:cardElevation="10dp"
         app:cardMaxElevation="12dp"
@@ -42,7 +43,8 @@
             android:layout_height="wrap_content"
             android:gravity="center"
             android:minLines="3"
-            android:text="Price" />
+            android:text="Price"
+            android:textColor="@color/design_default_color_on_primary"/>
     </androidx.cardview.widget.CardView>
 
 

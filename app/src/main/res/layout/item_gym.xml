@@ -1,72 +1,81 @@
 <?xml version="1.0" encoding="utf-8"?>
-<com.google.android.material.card.MaterialCardView xmlns:android="http://schemas.android.com/apk/res/android"
-    xmlns:app="http://schemas.android.com/apk/res-auto"
-    xmlns:tools="http://schemas.android.com/tools"
-    android:layout_width="match_parent"
-    android:layout_height="wrap_content"
-    android:clickable="true"
-    android:focusable="true"
-    android:id="@+id/gymCard"
-    app:cardBackgroundColor="@color/cardview_light_background"
-    app:cardCornerRadius="20dp"
-    app:cardElevation="10dp"
-    app:cardMaxElevation="12dp"
-    app:cardPreventCornerOverlap="true"
-    app:cardUseCompatPadding="true">
-
-    <androidx.constraintlayout.widget.ConstraintLayout
+<layout>
+    <data>
+        <variable
+            name="gym"
+            type="org.elsys.healthmap.ui.Gym" />
+    </data>
+    
+    <com.google.android.material.card.MaterialCardView xmlns:android="http://schemas.android.com/apk/res/android"
+        xmlns:app="http://schemas.android.com/apk/res-auto"
+        xmlns:tools="http://schemas.android.com/tools"
         android:layout_width="match_parent"
-        android:layout_height="135dp">
-
-        <ImageView
-            android:id="@+id/imageView"
-            android:layout_width="60dp"
-            android:layout_height="60dp"
-            app:layout_constraintBottom_toBottomOf="parent"
-            app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintHorizontal_bias="0.047"
-            app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toTopOf="parent"
-            app:layout_constraintVertical_bias="0.296" />
-
-        <TextView
-            android:id="@+id/gymNameAddress"
-            android:layout_width="wrap_content"
-            android:layout_height="60dp"
-            android:gravity="center"
-            android:text="Address/Name"
-            android:textSize="30sp"
-            app:layout_constraintBottom_toBottomOf="parent"
-            app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintHorizontal_bias="0.113"
-            app:layout_constraintStart_toEndOf="@+id/imageView"
-            app:layout_constraintTop_toTopOf="parent"
-            app:layout_constraintVertical_bias="0.293" />
-
-        <TextView
-            android:id="@+id/textView2"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:text="Rating: "
-            app:layout_constraintBottom_toBottomOf="parent"
-            app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintHorizontal_bias="0.042"
-            app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toTopOf="parent"
-            app:layout_constraintVertical_bias="0.786" />
-
-        <androidx.appcompat.widget.AppCompatRatingBar
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:scaleX=".5"
-            android:scaleY=".5"
-            android:id="@+id/gymRatingBar"
-            app:layout_constraintBottom_toBottomOf="parent"
-            app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintHorizontal_bias="0.036"
-            app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toTopOf="parent"
-            app:layout_constraintVertical_bias="0.948" />
-    </androidx.constraintlayout.widget.ConstraintLayout>
-
-</com.google.android.material.card.MaterialCardView>
+        android:layout_height="wrap_content"
+        android:clickable="true"
+        android:focusable="true"
+        android:id="@+id/gymCard"
+        app:cardBackgroundColor="@color/cardview_light_background"
+        app:cardCornerRadius="20dp"
+        app:cardElevation="10dp"
+        app:cardMaxElevation="12dp"
+        app:cardPreventCornerOverlap="true"
+        app:cardUseCompatPadding="true">
+    
+        <androidx.constraintlayout.widget.ConstraintLayout
+            android:layout_width="match_parent"
+            android:layout_height="135dp">
+    
+            <ImageView
+                android:id="@+id/imageView"
+                android:layout_width="60dp"
+                android:layout_height="60dp"
+                app:layout_constraintBottom_toBottomOf="parent"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintHorizontal_bias="0.047"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toTopOf="parent"
+                app:layout_constraintVertical_bias="0.296" />
+    
+            <TextView
+                android:id="@+id/gymNameAddress"
+                android:layout_width="wrap_content"
+                android:layout_height="60dp"
+                android:gravity="center"
+                android:text="@{gym.address}"
+                android:textSize="30sp"
+                app:layout_constraintBottom_toBottomOf="parent"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintHorizontal_bias="0.113"
+                app:layout_constraintStart_toEndOf="@+id/imageView"
+                app:layout_constraintTop_toTopOf="parent"
+                app:layout_constraintVertical_bias="0.293" />
+    
+            <TextView
+                android:id="@+id/textView2"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="@string/rating"
+                android:rating="@{gym.rating}"
+                app:layout_constraintBottom_toBottomOf="parent"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintHorizontal_bias="0.042"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toTopOf="parent"
+                app:layout_constraintVertical_bias="0.786" />
+    
+            <androidx.appcompat.widget.AppCompatRatingBar
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:scaleX=".5"
+                android:scaleY=".5"
+                android:id="@+id/gymRatingBar"
+                app:layout_constraintBottom_toBottomOf="parent"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintHorizontal_bias="0.036"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toTopOf="parent"
+                app:layout_constraintVertical_bias="0.948" />
+        </androidx.constraintlayout.widget.ConstraintLayout>
+    
+    </com.google.android.material.card.MaterialCardView>
+</layout>
