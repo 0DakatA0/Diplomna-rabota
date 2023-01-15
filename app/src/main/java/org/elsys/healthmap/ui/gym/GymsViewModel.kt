@@ -1,11 +1,10 @@
 package org.elsys.healthmap.ui.gym
 
 import androidx.lifecycle.LiveData
-import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.liveData
 import kotlinx.coroutines.delay
-import org.elsys.healthmap.ui.Gym
+import org.elsys.healthmap.models.Gym
 
 class GymsViewModel : ViewModel() {
     val gyms: LiveData<List<Gym>> = liveData {
@@ -16,9 +15,9 @@ class GymsViewModel : ViewModel() {
                     emptyList(),
                     "address1",
                     3.5f,
-                    "This id description",
+                    "This is the description description",
                     listOf("tag1", "tag2"),
-                    mapOf(
+                    listOf(
                         Pair("Product", "Price"),
                         Pair("Product", "Price")
                     )
@@ -30,7 +29,7 @@ class GymsViewModel : ViewModel() {
                     4f,
                     "This id description",
                     listOf("tag1", "tag2"),
-                    mapOf(
+                    listOf(
                         Pair("Product", "Price"),
                         Pair("Product", "Price")
                     )
@@ -42,7 +41,7 @@ class GymsViewModel : ViewModel() {
                     5f,
                     "This id description",
                     listOf("tag1", "tag2"),
-                    mapOf(
+                    listOf(
                         Pair("Product", "Price"),
                         Pair("Product", "Price")
                     )
@@ -61,7 +60,7 @@ class GymsViewModel : ViewModel() {
                     3.5f,
                     "This id description",
                     listOf("tag1", "tag2"),
-                    mapOf(
+                    listOf(
                         Pair("Product", "Price"),
                         Pair("Product", "Price")
                     )
@@ -73,7 +72,7 @@ class GymsViewModel : ViewModel() {
                     4f,
                     "This id description",
                     listOf("tag1", "tag2"),
-                    mapOf(
+                    listOf(
                         Pair("Product", "Price"),
                         Pair("Product", "Price")
                     )
@@ -85,7 +84,7 @@ class GymsViewModel : ViewModel() {
                     5f,
                     "This id description",
                     listOf("tag1", "tag2"),
-                    mapOf(
+                    listOf(
                         Pair("Product", "Price"),
                         Pair("Product", "Price")
                     )

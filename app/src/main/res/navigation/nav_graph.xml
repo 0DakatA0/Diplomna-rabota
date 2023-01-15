@@ -43,5 +43,9 @@
         android:label="Edit Gym"
         android:name="org.elsys.healthmap.ui.gym.GymEditFragment"
         tools:layout="@layout/fragment_gym_edit">
+        <argument
+            android:name="position"
+            app:argType="integer"
+            android:defaultValue="0"/>
     </fragment>
 </navigation>

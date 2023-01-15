@@ -1,4 +1,4 @@
-package org.elsys.healthmap.ui
+package org.elsys.healthmap.models
 
 data class Gym(
     val name: String,
@@ -7,5 +7,5 @@ data class Gym(
     val rating: Float,
     val description: String,
     val tags: List<String>,
-    val priceTable: Map<String, String>
+    val priceTable: List<Pair<String, String>>
 )

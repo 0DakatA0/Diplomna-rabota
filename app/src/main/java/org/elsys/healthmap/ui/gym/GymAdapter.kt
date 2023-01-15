@@ -3,9 +3,11 @@ package org.elsys.healthmap.ui.gym
 import android.view.LayoutInflater
 import android.view.ViewGroup
 import androidx.lifecycle.LiveData
+import androidx.navigation.findNavController
+import androidx.navigation.fragment.NavHostFragment.Companion.findNavController
 import androidx.recyclerview.widget.RecyclerView
 import org.elsys.healthmap.databinding.ItemGymBinding
-import org.elsys.healthmap.ui.Gym
+import org.elsys.healthmap.models.Gym
 
 class GymAdapter (
     private val dataset: LiveData<List<Gym>>
@@ -23,10 +25,10 @@ class GymAdapter (
         val gym = dataset.value?.get(position)
         holder.binding.gym = gym
 
-//        holder.gymCard.setOnClickListener {
-//            val action = GymsFragmentDirections.actionGymsFragmentToGymEditFragment()
-//            holder.itemView.findNavController().navigate(action)
-//        }
+        holder.binding.root.setOnClickListener {
+            val action = GymsFragmentDirections.actionGymsFragmentToGymEditFragment(position)
+            holder.itemView.findNavController().navigate(action)
+        }
     }
 
     override fun getItemCount() = dataset.value?.size ?: 0

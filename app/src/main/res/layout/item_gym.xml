@@ -3,7 +3,7 @@
     <data>
         <variable
             name="gym"
-            type="org.elsys.healthmap.ui.Gym" />
+            type="org.elsys.healthmap.models.Gym" />
     </data>
     
     <com.google.android.material.card.MaterialCardView xmlns:android="http://schemas.android.com/apk/res/android"
