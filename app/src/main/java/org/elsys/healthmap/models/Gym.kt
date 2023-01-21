@@ -7,5 +7,5 @@ data class Gym(
     val rating: Float,
     val description: String,
     val tags: List<String>,
-    val priceTable: List<Pair<String, String>>
+    val priceTable: Map<String, Float>
 )

@@ -27,7 +27,7 @@ class GymEditFragment : Fragment() {
 
         val priceTable = binding.priceTableRecyclerView
 
-        val dataset = (gym?.priceTable?.toList() ?: emptyList())
+        val dataset = (gym?.priceTable?.toMap() ?: emptyMap())
         priceTable.adapter = GymEditPriceTableAdapter(dataset)
         priceTable.setHasFixedSize(false)
 
