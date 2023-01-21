@@ -10,7 +10,7 @@ import org.elsys.healthmap.databinding.ItemGymBinding
 import org.elsys.healthmap.models.Gym
 
 class GymAdapter (
-    private val dataset: LiveData<List<Gym>>
+    private val dataset: LiveData<Map<String, Gym>>
 ) : RecyclerView.Adapter<GymAdapter.GymViewHolder>() {
     class GymViewHolder(val binding: ItemGymBinding) : RecyclerView.ViewHolder(binding.root)
 
@@ -22,11 +22,14 @@ class GymAdapter (
     }
 
     override fun onBindViewHolder(holder: GymViewHolder, position: Int) {
-        val gym = dataset.value?.get(position)
+        val element = dataset.value?.toList()?.get(position)
+
+        val key = element?.first
+        val gym = element?.second
         holder.binding.gym = gym
 
         holder.binding.root.setOnClickListener {
-            val action = GymsFragmentDirections.actionGymsFragmentToGymEditFragment(position)
+            val action = GymsFragmentDirections.actionGymsFragmentToGymEditFragment(key)
             holder.itemView.findNavController().navigate(action)
         }
     }

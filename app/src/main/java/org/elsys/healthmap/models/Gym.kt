@@ -5,7 +5,9 @@ data class Gym(
     val photos: List<String>,
     val address: String,
     val rating: Float,
-    val description: String,
+    var description: String,
     val tags: List<String>,
     val priceTable: Map<String, Float>
-)
+) {
+    constructor() : this("", emptyList(), "", 0f, "", emptyList(), emptyMap())
+}
