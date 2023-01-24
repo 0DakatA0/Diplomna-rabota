@@ -27,6 +27,8 @@ class GymEditFragment : Fragment() {
         container: ViewGroup?,
         savedInstanceState: Bundle?
     ): View {
+        // TODO мисля че това не е правилния метод когато става въпрос за Fragment
+        // Виж https://developer.android.com/topic/libraries/data-binding/generated-binding#create, по-точно в края на секцията
         val binding = FragmentGymEditBinding.inflate(inflater)
 
         var gym = viewModel.gyms.value?.get(args.id)
