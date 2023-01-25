@@ -3,6 +3,7 @@ package org.elsys.healthmap.ui.gym
 import android.os.Bundle
 import android.text.Editable
 import android.text.TextWatcher
+import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
@@ -10,41 +11,40 @@ import android.widget.Toast
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.activityViewModels
 import androidx.lifecycle.lifecycleScope
+import androidx.navigation.fragment.findNavController
 import androidx.navigation.fragment.navArgs
 import kotlinx.coroutines.launch
 import org.elsys.healthmap.databinding.FragmentGymEditBinding
 import org.elsys.healthmap.models.Gym
+import org.elsys.healthmap.repositories.GymsRepository
 
 class GymEditFragment : Fragment() {
     private val viewModel: GymsViewModel by activityViewModels()
     private var isChanged = false
     private val args: GymEditFragmentArgs by navArgs()
-
-    // TODO: clone, the gym, edit the clone, save the clone and if successful, replace the original
+    private lateinit var gym: Gym
 
     override fun onCreateView(
         inflater: LayoutInflater,
         container: ViewGroup?,
         savedInstanceState: Bundle?
     ): View {
-        // TODO мисля че това не е правилния метод когато става въпрос за Fragment
-        // Виж https://developer.android.com/topic/libraries/data-binding/generated-binding#create, по-точно в края на секцията
-        val binding = FragmentGymEditBinding.inflate(inflater)
+        val binding = FragmentGymEditBinding.inflate(inflater, container, false)
 
-        var gym = viewModel.gyms.value?.get(args.id)
+        gym = viewModel.gyms.value?.get(args.id)?.let { Gym(it) }!!
 
         binding.gym = gym
-        binding.tags = gym?.tags?.joinToString(", ")
+        binding.tags = gym.tags.joinToString(", ")
 
         val priceTable = binding.priceTableRecyclerView
 
-        val dataset = (gym?.priceTable?.toMap() ?: emptyMap())
+        val dataset = (gym.priceTable.toMap())
         priceTable.adapter = GymEditPriceTableAdapter(dataset)
         priceTable.setHasFixedSize(false)
 
         binding.description.addTextChangedListener(object : TextWatcher {
             override fun afterTextChanged(s: Editable?) {
-                gym?.description = s.toString()
+                gym.description = s.toString()
                 isChanged = true
             }
 
@@ -63,7 +63,7 @@ class GymEditFragment : Fragment() {
 
         this.lifecycleScope.launch {
             if (isChanged) {
-                args.id?.let { viewModel.saveGym(it) }
+                args.id?.let { GymsRepository.saveGym(it, gym) }
                 isChanged = false
             }
         }
