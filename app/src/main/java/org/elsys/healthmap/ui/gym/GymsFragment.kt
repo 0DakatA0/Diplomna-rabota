@@ -7,6 +7,7 @@ import android.view.ViewGroup
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.activityViewModels
 import org.elsys.healthmap.databinding.FragmentGymsBinding
+import org.elsys.healthmap.models.Gym
 
 class GymsFragment : Fragment() {
     private val viewModel: GymsViewModel by activityViewModels()

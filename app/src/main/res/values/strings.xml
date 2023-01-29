@@ -7,6 +7,7 @@
     <string name="password">Password</string>
     <string name="sign_up">Sign Up</string>
     <string name="rating">Rating:</string>
+    <string name="add_photo">Add Photo</string>
     <string-array name="user_types">
         <item>User</item>
         <item>Gym Owner</item>

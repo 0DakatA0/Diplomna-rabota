@@ -1,6 +1,5 @@
 package org.elsys.healthmap.repositories
 
-import android.annotation.SuppressLint
 import com.google.firebase.firestore.FirebaseFirestore
 import kotlinx.coroutines.tasks.await
 import org.elsys.healthmap.models.Gym
