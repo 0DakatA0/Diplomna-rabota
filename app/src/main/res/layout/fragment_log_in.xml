@@ -17,7 +17,7 @@
             app:layout_constraintTop_toTopOf="parent">
 
                 <EditText
-                    android:id="@+id/editText"
+                    android:id="@+id/loginUsernameEmail"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:layout_marginHorizontal="40dp"
@@ -30,12 +30,13 @@
                     app:layout_constraintVertical_bias="0.437" />
 
                 <EditText
-                    android:id="@+id/editText2"
+                    android:id="@+id/logInPassword"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:layout_marginHorizontal="40dp"
                     android:layout_marginTop="20dp"
-                    android:hint="Password"
+                    android:hint="@string/password"
+                    android:inputType="textPassword"
                     app:layout_constraintEnd_toEndOf="parent"
                     app:layout_constraintStart_toStartOf="parent"
                     app:layout_constraintTop_toBottomOf="@+id/editText" />

@@ -23,7 +23,7 @@ class GymsRepository {
                     }
                 }
 
-            return gyms;
+            return gyms
         }
 
         suspend fun saveGym(id: String, gym: Gym) {

@@ -24,12 +24,18 @@ class GymEditFragment : Fragment() {
     private var isChanged = false
     private val args: GymEditFragmentArgs by navArgs()
     private lateinit var gym: Gym
+    private lateinit var adapter: GymImagesAdapter
     private val pickMedia = registerForActivityResult(ActivityResultContracts.PickVisualMedia()) { uri ->
         if (uri != null) {
             lifecycleScope.launch {
-                val img = ImagesRepository.uploadImage(uri)
-                gym.photos.add(img)
-                isChanged = true;
+                val imgName = ImagesRepository.uploadImage(uri)
+                gym.photos.add(imgName)
+
+                //TODO копираш съдържанието на Uri-a във файл в кеш директорията
+                //TODO да направя съспенд функция която да се изпълнява на различен диспечер
+
+                adapter.notifyDataSetChanged()
+                isChanged = true
             }
         }
     }
@@ -43,13 +49,10 @@ class GymEditFragment : Fragment() {
 
         gym = viewModel.gyms.value?.get(args.id)?.let { Gym(it) }!!
 
-        lifecycleScope.launch {
-            ImagesRepository.getImages(gym.photos)
-            val adapter = GymImagesAdapter(gym.photos, requireContext())
-            val gymImagesRecyclerView = binding.gymImagesRecyclerView
-            gymImagesRecyclerView.adapter = adapter
-            gymImagesRecyclerView.setHasFixedSize(false)
-        }
+        adapter = GymImagesAdapter(gym.photos, requireContext().cacheDir, viewModel.viewModelScope)
+        val gymImagesRecyclerView = binding.gymImagesRecyclerView
+        gymImagesRecyclerView.adapter = adapter
+        gymImagesRecyclerView.setHasFixedSize(false)
 
         binding.gym = gym
         binding.tags = gym.tags.joinToString(", ")
@@ -94,6 +97,6 @@ class GymEditFragment : Fragment() {
     override fun onDestroy() {
         super.onDestroy()
 
-        context?.cacheDir?.deleteRecursively()
+        context?.cacheDir?.delete()
     }
 }

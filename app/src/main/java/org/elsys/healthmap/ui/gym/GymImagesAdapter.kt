@@ -1,23 +1,20 @@
 package org.elsys.healthmap.ui.gym
 
 import android.content.Context
-import android.util.Log
 import android.view.LayoutInflater
 import android.view.ViewGroup
 import androidx.core.net.toUri
 import androidx.recyclerview.widget.RecyclerView
-import com.bumptech.glide.Glide
-import com.bumptech.glide.load.engine.DiskCacheStrategy
-import com.bumptech.glide.load.model.ModelLoader
-import com.bumptech.glide.signature.ObjectKey
-import com.google.firebase.storage.StorageReference
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.launch
 import org.elsys.healthmap.databinding.ItemGymPictureBinding
+import org.elsys.healthmap.repositories.ImagesRepository
 import java.io.File
-import java.security.MessageDigest
 
 class GymImagesAdapter (
     private val dataset: List<String>,
-    private val context: Context
+    private val cacheDir: File,
+    private val scope: CoroutineScope
 ) : RecyclerView.Adapter<GymImagesAdapter.GymPictureViewHolder>() {
     class GymPictureViewHolder(val binding: ItemGymPictureBinding)
         : RecyclerView.ViewHolder(binding.root)
@@ -30,14 +27,15 @@ class GymImagesAdapter (
     }
 
     override fun onBindViewHolder(holder: GymPictureViewHolder, position: Int) {
-        val files = context.cacheDir.listFiles()
+        val file = File(cacheDir, dataset[position])
 
-        files?.forEach {
-            if (it.name.contains(dataset[position])) {
-                Glide.with(context)
-                    .load(it)
-                    .into(holder.binding.root)
+        if(!file.exists()) {
+            scope.launch {
+                ImagesRepository.getImage(dataset[position], file)
+                holder.binding.root.setImageURI(file.toUri())
             }
+        } else {
+            holder.binding.root.setImageURI(file.toUri())
         }
     }
 

@@ -1,25 +1,22 @@
 package org.elsys.healthmap.repositories
 
 import android.net.Uri
-import android.util.Log
-import androidx.core.net.toUri
 import com.google.firebase.ktx.Firebase
-import com.google.firebase.storage.StorageReference
 import com.google.firebase.storage.ktx.storage
+import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.tasks.await
+import kotlinx.coroutines.withContext
 import java.io.File
-import java.util.UUID
+import java.util.*
 
 class ImagesRepository {
     companion object {
         private val storageRef = Firebase.storage.reference
 
-        suspend fun getImages(images: List<String>) {
-            images.forEach { image ->
-                val imageRef = storageRef.child(image)
-                val localFile = File.createTempFile(image, "jpeg")
-                imageRef.getFile(localFile).await()
-            }
+        suspend fun getImage(image: String, downloadFile: File) {
+            val imageRef = storageRef.child(image)
+
+            imageRef.getFile(downloadFile).await()
         }
 
         suspend fun uploadImage(image: Uri): String {
