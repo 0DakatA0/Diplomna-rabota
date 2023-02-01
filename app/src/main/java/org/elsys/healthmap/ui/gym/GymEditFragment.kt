@@ -3,21 +3,27 @@ package org.elsys.healthmap.ui.gym
 import android.os.Bundle
 import android.text.Editable
 import android.text.TextWatcher
+import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import androidx.activity.result.PickVisualMediaRequest
 import androidx.activity.result.contract.ActivityResultContracts
+import androidx.core.net.toFile
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.activityViewModels
 import androidx.lifecycle.lifecycleScope
 import androidx.lifecycle.viewModelScope
 import androidx.navigation.fragment.navArgs
+import com.google.common.io.Files
+import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import org.elsys.healthmap.databinding.FragmentGymEditBinding
 import org.elsys.healthmap.models.Gym
 import org.elsys.healthmap.repositories.GymsRepository
 import org.elsys.healthmap.repositories.ImagesRepository
+import java.io.File
+import java.io.FileOutputStream
 
 class GymEditFragment : Fragment() {
     private val viewModel: GymsViewModel by activityViewModels()
@@ -31,8 +37,17 @@ class GymEditFragment : Fragment() {
                 val imgName = ImagesRepository.uploadImage(uri)
                 gym.photos.add(imgName)
 
-                //TODO копираш съдържанието на Uri-a във файл в кеш директорията
-                //TODO да направя съспенд функция която да се изпълнява на различен диспечер
+                viewModel.viewModelScope.launch(Dispatchers.IO) {
+                    val inputStream = requireContext().contentResolver.openInputStream(uri)
+                    val file = File(requireContext().cacheDir, imgName)
+                    val outputStream = FileOutputStream(file)
+
+                    inputStream?.use { input ->
+                        outputStream.use { output ->
+                            input.copyTo(output)
+                        }
+                    }
+                }
 
                 adapter.notifyDataSetChanged()
                 isChanged = true
@@ -49,7 +64,7 @@ class GymEditFragment : Fragment() {
 
         gym = viewModel.gyms.value?.get(args.id)?.let { Gym(it) }!!
 
-        adapter = GymImagesAdapter(gym.photos, requireContext().cacheDir, viewModel.viewModelScope)
+        adapter = GymImagesAdapter(gym.photos, requireContext().cacheDir, viewModel.viewModelScope, isChanged)
         val gymImagesRecyclerView = binding.gymImagesRecyclerView
         gymImagesRecyclerView.adapter = adapter
         gymImagesRecyclerView.setHasFixedSize(false)

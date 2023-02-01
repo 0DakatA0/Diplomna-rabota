@@ -1,6 +1,5 @@
 package org.elsys.healthmap.ui.gym
 
-import android.content.Context
 import android.view.LayoutInflater
 import android.view.ViewGroup
 import androidx.core.net.toUri
@@ -12,9 +11,10 @@ import org.elsys.healthmap.repositories.ImagesRepository
 import java.io.File
 
 class GymImagesAdapter (
-    private val dataset: List<String>,
+    private val dataset: MutableList<String>,
     private val cacheDir: File,
-    private val scope: CoroutineScope
+    private val scope: CoroutineScope,
+    private var isChanged: Boolean
 ) : RecyclerView.Adapter<GymImagesAdapter.GymPictureViewHolder>() {
     class GymPictureViewHolder(val binding: ItemGymPictureBinding)
         : RecyclerView.ViewHolder(binding.root)
@@ -36,6 +36,18 @@ class GymImagesAdapter (
             }
         } else {
             holder.binding.root.setImageURI(file.toUri())
+        }
+
+        holder.binding.root.setOnLongClickListener {
+            scope.launch {
+                ImagesRepository.deleteImage(dataset[position])
+                dataset.removeAt(position)
+                notifyItemRemoved(position)
+                file.delete()
+                isChanged = true
+            }
+
+            return@setOnLongClickListener true;
         }
     }
 

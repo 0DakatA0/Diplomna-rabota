@@ -27,8 +27,9 @@ class ImagesRepository {
             return imageName
         }
 
-        fun deleteImage(image: String) {
-
+        suspend fun deleteImage(image: String) {
+            val imageRef = storageRef.child(image)
+            imageRef.delete().await()
         }
     }
 }
