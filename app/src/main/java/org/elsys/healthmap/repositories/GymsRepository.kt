@@ -32,5 +32,20 @@ class GymsRepository {
                 .set(gym)
                 .await()
         }
+
+        suspend fun addGym(gym: Gym): String {
+            val docRef = db.collection("gyms")
+                .add(gym)
+                .await()
+
+            return docRef.id
+        }
+
+        suspend fun deleteGym(id: String) {
+            db.collection("gyms")
+                .document(id)
+                .delete()
+                .await()
+        }
     }
 }

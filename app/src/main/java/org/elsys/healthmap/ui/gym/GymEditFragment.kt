@@ -3,19 +3,17 @@ package org.elsys.healthmap.ui.gym
 import android.os.Bundle
 import android.text.Editable
 import android.text.TextWatcher
-import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import androidx.activity.result.PickVisualMediaRequest
 import androidx.activity.result.contract.ActivityResultContracts
-import androidx.core.net.toFile
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.activityViewModels
 import androidx.lifecycle.lifecycleScope
 import androidx.lifecycle.viewModelScope
+import androidx.navigation.fragment.findNavController
 import androidx.navigation.fragment.navArgs
-import com.google.common.io.Files
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import org.elsys.healthmap.databinding.FragmentGymEditBinding
@@ -73,13 +71,39 @@ class GymEditFragment : Fragment() {
         binding.tags = gym.tags.joinToString(", ")
 
         val priceTable = binding.priceTableRecyclerView
-        val priceTableDataset = gym.priceTable.toMap()
-        priceTable.adapter = GymEditPriceTableAdapter(priceTableDataset)
+        val priceTableDataset = gym.priceTable
+        priceTable.adapter = GymEditPriceTableAdapter(priceTableDataset, isChanged)
         priceTable.setHasFixedSize(false)
         
         binding.addPhotoButton.setOnClickListener {
             pickMedia.launch(PickVisualMediaRequest(ActivityResultContracts.PickVisualMedia.ImageOnly))
         }
+
+        binding.gymName.addTextChangedListener(object : TextWatcher {
+            override fun afterTextChanged(s: Editable?) {
+                gym.name = s.toString()
+                isChanged = true
+            }
+
+            override fun beforeTextChanged(s: CharSequence?, start: Int, count: Int, after: Int) {
+            }
+
+            override fun onTextChanged(s: CharSequence?, start: Int, before: Int, count: Int) {
+            }
+        })
+
+        binding.tagsField.addTextChangedListener(object : TextWatcher {
+            override fun afterTextChanged(s: Editable?) {
+                gym.tags = s.toString().split(", ") as MutableList<String>
+                isChanged = true
+            }
+
+            override fun beforeTextChanged(s: CharSequence?, start: Int, count: Int, after: Int) {
+            }
+
+            override fun onTextChanged(s: CharSequence?, start: Int, before: Int, count: Int) {
+            }
+        })
 
         binding.description.addTextChangedListener(object : TextWatcher {
             override fun afterTextChanged(s: Editable?) {
@@ -94,6 +118,11 @@ class GymEditFragment : Fragment() {
             }
         })
 
+        binding.addToPriceTableButton.setOnClickListener {
+            val action = GymEditFragmentDirections.actionGymEditFragmentToAddPriceTableElementFragment(args.id)
+            findNavController().navigate(action)
+        }
+
         return binding.root
     }
 
@@ -102,16 +131,11 @@ class GymEditFragment : Fragment() {
 
         viewModel.viewModelScope.launch {
             if (isChanged) {
-                args.id?.let { GymsRepository.saveGym(it, gym) }
+                args.id.let { GymsRepository.saveGym(it, gym) }
                 isChanged = false
-                args.id?.let { viewModel.saveGym(it, gym) }
+                args.id.let { viewModel.saveGym(it, gym) }
             }
         }
     }
 
-    override fun onDestroy() {
-        super.onDestroy()
-
-        context?.cacheDir?.delete()
-    }
 }

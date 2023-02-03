@@ -1,0 +1,41 @@
+<?xml version="1.0" encoding="utf-8"?>
+<navigation xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:id="@+id/gymOwnerNavGraph"
+    app:startDestination="@id/gymsFragment">
+
+    <fragment
+        android:id="@+id/gymsFragment"
+        android:label="Gyms"
+        android:name="org.elsys.healthmap.ui.gym.GymsFragment"
+        tools:layout="@layout/fragment_gyms">
+        <action
+            android:id="@+id/action_gymsFragment_to_gymEditFragment"
+            app:destination="@id/gymEditFragment"
+            app:enterAnim="@android:anim/slide_in_left"
+            app:popExitAnim="@android:anim/slide_out_right" />
+    </fragment>
+
+    <fragment
+        android:id="@+id/gymEditFragment"
+        android:label="Edit Gym"
+        android:name="org.elsys.healthmap.ui.gym.GymEditFragment"
+        tools:layout="@layout/fragment_gym_edit">
+        <argument
+            android:name="id"
+            app:argType="string"/>
+        <action
+            android:id="@+id/action_gymEditFragment_to_addPriceTableElementFragment"
+            app:destination="@id/addPriceTableElementFragment" />
+    </fragment>
+    <fragment
+        android:id="@+id/addPriceTableElementFragment"
+        android:name="org.elsys.healthmap.ui.gym.AddPriceTableElementFragment"
+        android:label="Add Price Table Element"
+        tools:layout="@layout/fragment_add_price_table_element">
+        <argument
+            android:name="id"
+            app:argType="string"/>
+    </fragment>
+</navigation>

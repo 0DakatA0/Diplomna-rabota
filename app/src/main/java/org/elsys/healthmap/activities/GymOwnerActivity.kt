@@ -1,19 +1,21 @@
-package org.elsys.healthmap
+package org.elsys.healthmap.activities
 
-import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
+import android.os.PersistableBundle
+import androidx.appcompat.app.AppCompatActivity
 import androidx.navigation.NavController
 import androidx.navigation.fragment.NavHostFragment
 import androidx.navigation.ui.setupActionBarWithNavController
-import org.elsys.healthmap.databinding.ActivityMainBinding
+import org.elsys.healthmap.R
+import org.elsys.healthmap.databinding.ActivityGymOwnerBinding
 
-class MainActivity : AppCompatActivity() {
+class GymOwnerActivity : AppCompatActivity() {
     private lateinit var navController: NavController
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
 
-        val binding = ActivityMainBinding.inflate(layoutInflater)
+        val binding = ActivityGymOwnerBinding.inflate(layoutInflater)
         setContentView(binding.root)
 
         val navHostFragment = supportFragmentManager
@@ -21,5 +23,9 @@ class MainActivity : AppCompatActivity() {
 
         navController = navHostFragment.navController
         setupActionBarWithNavController(navController)
+    }
+
+    override fun onSupportNavigateUp(): Boolean {
+        return navController.navigateUp() || super.onSupportNavigateUp()
     }
 }

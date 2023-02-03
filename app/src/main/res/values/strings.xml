@@ -8,6 +8,14 @@
     <string name="sign_up">Sign Up</string>
     <string name="rating">Rating:</string>
     <string name="add_photo">Add Photo</string>
+    <string name="name">name</string>
+    <string name="description_hint">Write a description...</string>
+    <string name="tags_hint">Write tags separated by comma</string>
+    <string name="add_address">Add Address</string>
+    <string name="product_price">Product Price</string>
+    <string name="product_name">Product Name</string>
+    <string name="add_item">Add Item</string>
+    <string name="add_to_price_table">Add to price table</string>
     <string-array name="user_types">
         <item>User</item>
         <item>Gym Owner</item>

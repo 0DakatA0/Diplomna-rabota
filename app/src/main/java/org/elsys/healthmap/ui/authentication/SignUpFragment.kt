@@ -1,5 +1,6 @@
 package org.elsys.healthmap.ui.authentication
 
+import android.content.Intent
 import android.os.Bundle
 import android.util.Log
 import android.view.LayoutInflater
@@ -12,6 +13,7 @@ import com.google.firebase.auth.ktx.auth
 import com.google.firebase.ktx.Firebase
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.tasks.await
+import org.elsys.healthmap.activities.GymOwnerActivity
 import org.elsys.healthmap.databinding.FragmentSignUpBinding
 
 class SignUpFragment : Fragment() {
@@ -35,7 +37,8 @@ class SignUpFragment : Fragment() {
                 val signUp = auth.createUserWithEmailAndPassword(email, password).await()
 
                 if(signUp.user != null) {
-                    findNavController().navigate(SignUpFragmentDirections.actionSignUpFragmentToGymsFragment())
+                    val intent = Intent(requireContext(), GymOwnerActivity::class.java)
+                    startActivity(intent)
                 }
                 else {
                     Log.d("SignUp", "Failed to sign up")

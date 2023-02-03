@@ -7,9 +7,9 @@ data class Gym(
     var rating: Float,
     var description: String,
     var tags: MutableList<String>,
-    var priceTable: Map<String, Float>
+    var priceTable: MutableMap<String, Float>
 ) {
-    constructor() : this("", mutableListOf(), "", 0f, "", mutableListOf(), emptyMap())
+    constructor() : this("", mutableListOf(), "", 0f, "", mutableListOf(), mutableMapOf())
     constructor(gym: Gym) : this(
         gym.name,
         gym.photos,

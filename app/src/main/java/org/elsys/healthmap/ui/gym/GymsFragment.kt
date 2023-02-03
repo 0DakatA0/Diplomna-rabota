@@ -6,8 +6,12 @@ import android.view.View
 import android.view.ViewGroup
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.activityViewModels
+import androidx.lifecycle.viewModelScope
+import androidx.navigation.fragment.findNavController
+import kotlinx.coroutines.launch
 import org.elsys.healthmap.databinding.FragmentGymsBinding
 import org.elsys.healthmap.models.Gym
+import org.elsys.healthmap.repositories.GymsRepository
 
 class GymsFragment : Fragment() {
     private val viewModel: GymsViewModel by activityViewModels()
@@ -21,8 +25,20 @@ class GymsFragment : Fragment() {
 
         val gyms = viewModel.gyms
 
+        val addGymButton = binding.addGymButton
+
+        addGymButton.setOnClickListener {
+            viewModel.viewModelScope.launch {
+                val gym = Gym()
+                val id = GymsRepository.addGym(gym)
+                viewModel.addGym(gym, id)
+                val action = GymsFragmentDirections.actionGymsFragmentToGymEditFragment(id)
+                findNavController().navigate(action)
+            }
+        }
+
         val recyclerView = binding.gymsRecyclerView
-        val adapter = GymAdapter(gyms)
+        val adapter = GymAdapter(gyms, requireContext(), viewModel)
         recyclerView.adapter = adapter
         recyclerView.setHasFixedSize(false)
 

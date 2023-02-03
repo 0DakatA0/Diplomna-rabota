@@ -6,7 +6,8 @@ import androidx.recyclerview.widget.RecyclerView
 import org.elsys.healthmap.databinding.ItemPriceTableBinding
 
 class GymEditPriceTableAdapter(
-    private val dataset: Map<String, Float>
+    private val dataset: MutableMap<String, Float>,
+    private var isChanged: Boolean,
 ) : RecyclerView.Adapter<GymEditPriceTableAdapter.PriceTableViewHolder>() {
     class PriceTableViewHolder(val binding: ItemPriceTableBinding)
         : RecyclerView.ViewHolder(binding.root)
@@ -22,6 +23,13 @@ class GymEditPriceTableAdapter(
         val item = dataset.toList()[position]
         holder.binding.product = item.first
         holder.binding.price = item.second.toString()
+
+        holder.binding.root.setOnLongClickListener {
+            dataset.remove(item.first)
+            isChanged = true
+            notifyItemRemoved(position)
+            return@setOnLongClickListener true
+        }
     }
 
     override fun getItemCount() = dataset.size
