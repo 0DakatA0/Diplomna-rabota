@@ -8,7 +8,7 @@
     <fragment
         android:id="@+id/logInFragment"
         android:name="org.elsys.healthmap.ui.authentication.LogInFragment"
-        android:label="LogInFragment"
+        android:label="Log In"
         tools:layout="@layout/fragment_log_in">
         <action
             android:id="@+id/action_logInFragment_to_signUpFragment"
@@ -17,6 +17,6 @@
     <fragment
         android:id="@+id/signUpFragment"
         android:name="org.elsys.healthmap.ui.authentication.SignUpFragment"
-        android:label="SignUpFragment"
+        android:label="Sign Up"
         tools:layout="@layout/fragment_sign_up"/>
 </navigation>

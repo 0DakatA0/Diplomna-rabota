@@ -7,9 +7,10 @@ data class Gym(
     var rating: Float,
     var description: String,
     var tags: MutableList<String>,
-    var priceTable: MutableMap<String, Float>
+    var priceTable: MutableMap<String, Float>,
+    var owner: String
 ) {
-    constructor() : this("", mutableListOf(), "", 0f, "", mutableListOf(), mutableMapOf())
+    constructor() : this("", mutableListOf(), "", 0f, "", mutableListOf(), mutableMapOf(), "")
     constructor(gym: Gym) : this(
         gym.name,
         gym.photos,
@@ -17,6 +18,7 @@ data class Gym(
         gym.rating,
         gym.description,
         gym.tags,
-        gym.priceTable
+        gym.priceTable,
+        gym.owner
     )
 }

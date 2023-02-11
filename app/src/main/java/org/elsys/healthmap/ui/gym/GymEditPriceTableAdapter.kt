@@ -2,35 +2,40 @@ package org.elsys.healthmap.ui.gym
 
 import android.view.LayoutInflater
 import android.view.ViewGroup
+import androidx.lifecycle.LiveData
 import androidx.recyclerview.widget.RecyclerView
 import org.elsys.healthmap.databinding.ItemPriceTableBinding
 
 class GymEditPriceTableAdapter(
-    private val dataset: MutableMap<String, Float>,
-    private var isChanged: Boolean,
+    private val dataset: LiveData<Map<String, Float>>,
+    private val delete: (String) -> Unit,
 ) : RecyclerView.Adapter<GymEditPriceTableAdapter.PriceTableViewHolder>() {
-    class PriceTableViewHolder(val binding: ItemPriceTableBinding)
-        : RecyclerView.ViewHolder(binding.root)
+    class PriceTableViewHolder(val binding: ItemPriceTableBinding) :
+        RecyclerView.ViewHolder(binding.root)
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): PriceTableViewHolder {
-        val binding = ItemPriceTableBinding.inflate(LayoutInflater.from(parent.context),
-            parent,false)
+        val binding = ItemPriceTableBinding.inflate(
+            LayoutInflater.from(parent.context),
+            parent, false
+        )
 
         return PriceTableViewHolder(binding)
     }
 
     override fun onBindViewHolder(holder: PriceTableViewHolder, position: Int) {
-        val item = dataset.toList()[position]
-        holder.binding.product = item.first
-        holder.binding.price = item.second.toString()
+        val item = dataset.value?.toList()?.get(position)
+        if (item != null) {
+            holder.binding.product = item.first
+            holder.binding.price = item.second.toString()
+        }
 
         holder.binding.root.setOnLongClickListener {
-            dataset.remove(item.first)
-            isChanged = true
-            notifyItemRemoved(position)
+            if (item != null) {
+                delete(item.first)
+            }
             return@setOnLongClickListener true
         }
     }
 
-    override fun getItemCount() = dataset.size
+    override fun getItemCount() = dataset.value?.size ?: 0
 }

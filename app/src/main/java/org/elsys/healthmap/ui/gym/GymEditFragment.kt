@@ -3,6 +3,7 @@ package org.elsys.healthmap.ui.gym
 import android.os.Bundle
 import android.text.Editable
 import android.text.TextWatcher
+import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
@@ -10,48 +11,38 @@ import androidx.activity.result.PickVisualMediaRequest
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.activityViewModels
+import androidx.fragment.app.setFragmentResultListener
+import androidx.fragment.app.viewModels
 import androidx.lifecycle.lifecycleScope
 import androidx.lifecycle.viewModelScope
 import androidx.navigation.fragment.findNavController
 import androidx.navigation.fragment.navArgs
-import kotlinx.coroutines.Dispatchers
+import com.firebase.geofire.GeoFireUtils
+import com.firebase.geofire.GeoLocation
 import kotlinx.coroutines.launch
 import org.elsys.healthmap.databinding.FragmentGymEditBinding
 import org.elsys.healthmap.models.Gym
 import org.elsys.healthmap.repositories.GymsRepository
-import org.elsys.healthmap.repositories.ImagesRepository
+import org.elsys.healthmap.ui.viewmodels.GymEditViewModel
+import org.elsys.healthmap.ui.viewmodels.GymsViewModel
 import java.io.File
-import java.io.FileOutputStream
 
 class GymEditFragment : Fragment() {
-    private val viewModel: GymsViewModel by activityViewModels()
+    private val gymEditViewModel: GymEditViewModel by viewModels()
     private var isChanged = false
     private val args: GymEditFragmentArgs by navArgs()
-    private lateinit var gym: Gym
-    private lateinit var adapter: GymImagesAdapter
-    private val pickMedia = registerForActivityResult(ActivityResultContracts.PickVisualMedia()) { uri ->
-        if (uri != null) {
-            lifecycleScope.launch {
-                val imgName = ImagesRepository.uploadImage(uri)
-                gym.photos.add(imgName)
-
-                viewModel.viewModelScope.launch(Dispatchers.IO) {
-                    val inputStream = requireContext().contentResolver.openInputStream(uri)
-                    val file = File(requireContext().cacheDir, imgName)
-                    val outputStream = FileOutputStream(file)
-
-                    inputStream?.use { input ->
-                        outputStream.use { output ->
-                            input.copyTo(output)
-                        }
-                    }
+    private val pickMedia =
+        registerForActivityResult(ActivityResultContracts.PickVisualMedia()) { uri ->
+            if (uri != null) {
+                lifecycleScope.launch {
+                    gymEditViewModel.addPhoto(
+                        uri,
+                        requireContext().contentResolver,
+                        requireContext().cacheDir)
+                    isChanged = true
                 }
-
-                adapter.notifyDataSetChanged()
-                isChanged = true
             }
         }
-    }
 
     override fun onCreateView(
         inflater: LayoutInflater,
@@ -59,29 +50,68 @@ class GymEditFragment : Fragment() {
         savedInstanceState: Bundle?
     ): View {
         val binding = FragmentGymEditBinding.inflate(inflater, container, false)
+        gymEditViewModel.gymId = args.id
 
-        gym = viewModel.gyms.value?.get(args.id)?.let { Gym(it) }!!
+        val adapter = GymImagesAdapter(
+            gymEditViewModel.photos,
+            requireContext().cacheDir,
+            gymEditViewModel.viewModelScope
+        ) {
+            gymEditViewModel.viewModelScope.launch {
+                gymEditViewModel.deletePhoto(it, requireContext().cacheDir)
+            }
+        }
 
-        adapter = GymImagesAdapter(gym.photos, requireContext().cacheDir, viewModel.viewModelScope, isChanged)
+        gymEditViewModel.photos.observe(viewLifecycleOwner) {
+            adapter.notifyDataSetChanged()
+        }
+
         val gymImagesRecyclerView = binding.gymImagesRecyclerView
         gymImagesRecyclerView.adapter = adapter
         gymImagesRecyclerView.setHasFixedSize(false)
 
-        binding.gym = gym
-        binding.tags = gym.tags.joinToString(", ")
+        gymEditViewModel.gym.observe(viewLifecycleOwner) {
+            binding.gym = gymEditViewModel.gym.value
+            binding.tags = gymEditViewModel.gym.value?.tags?.joinToString(", ")
+        }
+
+        binding.addressPickerNavigationButton.setOnClickListener {
+            val action = GymEditFragmentDirections.actionGymEditFragmentToPickAddressFragment()
+            findNavController().navigate(action)
+        }
+
+        setFragmentResultListener("PICK_ADDRESS") { _, bundle ->
+            val lat = bundle.getDouble("latitude")
+            val lng = bundle.getDouble("longitude")
+
+//            gymEditViewModel.gym.value?.address = "$latitude $longitude"
+
+            val hash = GeoFireUtils.getGeoHashForLocation(GeoLocation(lat, lng))
+
+            gymEditViewModel.gym.value?.address = hash
+            Log.d("GymEditFragment", "address: ${gymEditViewModel.gym.value?.address}")
+            isChanged = true
+        }
 
         val priceTable = binding.priceTableRecyclerView
-        val priceTableDataset = gym.priceTable
-        priceTable.adapter = GymEditPriceTableAdapter(priceTableDataset, isChanged)
+        val priceTableDataset = gymEditViewModel.priceTable
+        priceTable.adapter = GymEditPriceTableAdapter(priceTableDataset) { product ->
+            gymEditViewModel.deletePriceTableElement(product)
+        }
+
+        gymEditViewModel.priceTable.observe(viewLifecycleOwner) {
+            priceTable.adapter?.notifyDataSetChanged()
+        }
+
         priceTable.setHasFixedSize(false)
-        
+
         binding.addPhotoButton.setOnClickListener {
             pickMedia.launch(PickVisualMediaRequest(ActivityResultContracts.PickVisualMedia.ImageOnly))
         }
 
         binding.gymName.addTextChangedListener(object : TextWatcher {
             override fun afterTextChanged(s: Editable?) {
-                gym.name = s.toString()
+                gymEditViewModel.gym.value?.name = s.toString()
                 isChanged = true
             }
 
@@ -94,7 +124,7 @@ class GymEditFragment : Fragment() {
 
         binding.tagsField.addTextChangedListener(object : TextWatcher {
             override fun afterTextChanged(s: Editable?) {
-                gym.tags = s.toString().split(", ") as MutableList<String>
+                gymEditViewModel.gym.value?.tags = s.toString().split(", ") as MutableList<String>
                 isChanged = true
             }
 
@@ -107,7 +137,7 @@ class GymEditFragment : Fragment() {
 
         binding.description.addTextChangedListener(object : TextWatcher {
             override fun afterTextChanged(s: Editable?) {
-                gym.description = s.toString()
+                gymEditViewModel.gym.value?.description = s.toString()
                 isChanged = true
             }
 
@@ -119,21 +149,25 @@ class GymEditFragment : Fragment() {
         })
 
         binding.addToPriceTableButton.setOnClickListener {
-            val action = GymEditFragmentDirections.actionGymEditFragmentToAddPriceTableElementFragment(args.id)
+            val action =
+                GymEditFragmentDirections.actionGymEditFragmentToAddPriceTableElementFragment()
             findNavController().navigate(action)
+        }
+
+        setFragmentResultListener("ADD_PRICE_TABLE_ELEMENT") { _, bundle ->
+            gymEditViewModel.addPriceTableElement(bundle)
         }
 
         return binding.root
     }
 
-    override fun onPause() {
-        super.onPause()
+    override fun onStop() {
+        super.onStop()
 
-        viewModel.viewModelScope.launch {
+        gymEditViewModel.viewModelScope.launch {
             if (isChanged) {
-                args.id.let { GymsRepository.saveGym(it, gym) }
+                gymEditViewModel.saveGym()
                 isChanged = false
-                args.id.let { viewModel.saveGym(it, gym) }
             }
         }
     }

@@ -16,6 +16,9 @@
     <string name="product_name">Product Name</string>
     <string name="add_item">Add Item</string>
     <string name="add_to_price_table">Add to price table</string>
+    <string name="log_out">Log Out</string>
+    <string name="mapbox_access_token">pk.eyJ1IjoiZHN0b2lsb3YxOTkiLCJhIjoiY2xkeXk3dmI0MHY0eTQybnY1NHQ3eTF1NSJ9.GIc6_M10J8pq8ya1DZNKYw</string>
+    <string name="pick_address">Pick Address</string>
     <string-array name="user_types">
         <item>User</item>
         <item>Gym Owner</item>

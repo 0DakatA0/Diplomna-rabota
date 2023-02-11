@@ -4,19 +4,19 @@ import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import androidx.core.os.bundleOf
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.activityViewModels
+import androidx.fragment.app.setFragmentResult
 import androidx.lifecycle.viewModelScope
 import androidx.navigation.fragment.findNavController
 import androidx.navigation.fragment.navArgs
 import kotlinx.coroutines.launch
 import org.elsys.healthmap.databinding.FragmentAddPriceTableElementBinding
 import org.elsys.healthmap.repositories.GymsRepository
+import org.elsys.healthmap.ui.viewmodels.GymsViewModel
 
 class AddPriceTableElementFragment : Fragment() {
-    private val viewModel: GymsViewModel by activityViewModels()
-    private val args: GymEditFragmentArgs by navArgs()
-
     override fun onCreateView(
         inflater: LayoutInflater,
         container: ViewGroup?,
@@ -27,20 +27,14 @@ class AddPriceTableElementFragment : Fragment() {
         val btn = binding.addElementToPriceTable
 
         btn.setOnClickListener {
-            val gym = viewModel.gyms.value?.get(args.id)
             val product = binding.productName.text.toString()
-            val price = binding.productPrice.text.toString()
+            val price = binding.productPrice.text.toString().toFloat()
 
-            if (gym != null) {
-                gym.priceTable[product] = price.toFloat()
-                args.id?.let { it1 -> viewModel.saveGym(it1, gym) }
-
-                viewModel.viewModelScope.launch {
-                    args.id?.let { it1 -> GymsRepository.saveGym(it1, gym) }
-                }
-
-                findNavController().popBackStack()
-            }
+            setFragmentResult(
+                "ADD_PRICE_TABLE_ELEMENT",
+                bundleOf("product" to product, "price" to price)
+            )
+            findNavController().popBackStack()
         }
 
         return binding.root

@@ -28,14 +28,20 @@
         <action
             android:id="@+id/action_gymEditFragment_to_addPriceTableElementFragment"
             app:destination="@id/addPriceTableElementFragment" />
+        <action
+            android:id="@+id/action_gymEditFragment_to_pickAddressFragment"
+            app:destination="@id/pickAddressFragment" />
     </fragment>
     <fragment
         android:id="@+id/addPriceTableElementFragment"
         android:name="org.elsys.healthmap.ui.gym.AddPriceTableElementFragment"
         android:label="Add Price Table Element"
         tools:layout="@layout/fragment_add_price_table_element">
-        <argument
-            android:name="id"
-            app:argType="string"/>
     </fragment>
+    <fragment
+        android:id="@+id/pickAddressFragment"
+        android:name="org.elsys.healthmap.ui.gym.PickAddressFragment"
+        android:label="Pick Address"
+        tools:layout="@layout/fragment_pick_address"
+        />
 </navigation>

@@ -1,8 +1,6 @@
 package org.elsys.healthmap.ui.gym
 
-import android.app.AlertDialog
 import android.content.Context
-import android.content.DialogInterface
 import android.view.LayoutInflater
 import android.view.ViewGroup
 import androidx.core.net.toUri
@@ -10,19 +8,18 @@ import androidx.lifecycle.LiveData
 import androidx.lifecycle.viewModelScope
 import androidx.navigation.findNavController
 import androidx.recyclerview.widget.RecyclerView
-import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.launch
-import org.elsys.healthmap.R
 import org.elsys.healthmap.databinding.ItemGymBinding
 import org.elsys.healthmap.models.Gym
-import org.elsys.healthmap.repositories.GymsRepository
 import org.elsys.healthmap.repositories.ImagesRepository
+import org.elsys.healthmap.ui.viewmodels.GymsViewModel
 import java.io.File
 
 class GymAdapter (
     private val dataset: LiveData<Map<String, Gym>>,
-    private val context: Context,
+    private val cacheDir: File,
     private val viewModel: GymsViewModel,
+    private val delete: (String) -> Unit
 ) : RecyclerView.Adapter<GymAdapter.GymViewHolder>() {
     class GymViewHolder(val binding: ItemGymBinding) : RecyclerView.ViewHolder(binding.root)
 
@@ -41,7 +38,7 @@ class GymAdapter (
         holder.binding.gym = gym
 
         val file = if(gym?.photos?.isNotEmpty() == true){
-            File(context.cacheDir, gym.photos[0])
+            File(cacheDir, gym.photos[0])
         } else {
             null
         }
@@ -71,29 +68,9 @@ class GymAdapter (
         }
 
         holder.binding.root.setOnLongClickListener {
-            val builder = AlertDialog.Builder(context)
-
-            builder.apply {
-                setPositiveButton("Yes") { _, _ ->
-                    if (id != null) {
-                        viewModel.viewModelScope.launch {
-                            GymsRepository.deleteGym(id)
-
-                            for (photo in gym?.photos!!) {
-                                ImagesRepository.deleteImage(photo)
-                            }
-
-                            viewModel.deleteGym(id)
-                        }
-                    }
-                }
-                setNegativeButton("No") { _, _ ->
-
-                }
+            if (id != null) {
+                delete(id)
             }
-            builder.setMessage("Are you shore that you want to delete that gym?")
-            builder.create().show()
-
             return@setOnLongClickListener true
         }
     }
