@@ -1,4 +1,4 @@
-package org.elsys.healthmap.ui.gym
+package org.elsys.healthmap.ui.viewmodels.gym
 
 import android.os.Bundle
 import android.text.Editable
@@ -19,6 +19,7 @@ import androidx.navigation.fragment.findNavController
 import androidx.navigation.fragment.navArgs
 import com.firebase.geofire.GeoFireUtils
 import com.firebase.geofire.GeoLocation
+import com.google.firebase.firestore.GeoPoint
 import kotlinx.coroutines.launch
 import org.elsys.healthmap.databinding.FragmentGymEditBinding
 import org.elsys.healthmap.models.Gym
@@ -84,12 +85,10 @@ class GymEditFragment : Fragment() {
             val lat = bundle.getDouble("latitude")
             val lng = bundle.getDouble("longitude")
 
-//            gymEditViewModel.gym.value?.address = "$latitude $longitude"
-
             val hash = GeoFireUtils.getGeoHashForLocation(GeoLocation(lat, lng))
 
             gymEditViewModel.gym.value?.address = hash
-            Log.d("GymEditFragment", "address: ${gymEditViewModel.gym.value?.address}")
+            gymEditViewModel.gym.value?.coordinates = GeoPoint(lat, lng)
             isChanged = true
         }
 

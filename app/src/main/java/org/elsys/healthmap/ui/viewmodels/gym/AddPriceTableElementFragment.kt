@@ -1,4 +1,4 @@
-package org.elsys.healthmap.ui.gym
+package org.elsys.healthmap.ui.viewmodels.gym
 
 import android.os.Bundle
 import android.view.LayoutInflater

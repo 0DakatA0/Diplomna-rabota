@@ -22,6 +22,7 @@ class GymEditViewModel : ViewModel() {
 
     var gymId: String? = null
         set(value) {
+            if(value == field) return
 
             viewModelScope.launch {
                 val gymFromDB = value?.let { GymsRepository.getGym(it) }
