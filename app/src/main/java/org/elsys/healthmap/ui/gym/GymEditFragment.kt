@@ -1,4 +1,4 @@
-package org.elsys.healthmap.ui.viewmodels.gym
+package org.elsys.healthmap.ui.gym
 
 import android.os.Bundle
 import android.text.Editable
@@ -84,10 +84,14 @@ class GymEditFragment : Fragment() {
         setFragmentResultListener("PICK_ADDRESS") { _, bundle ->
             val lat = bundle.getDouble("latitude")
             val lng = bundle.getDouble("longitude")
+            val address = bundle.getString("address")
 
             val hash = GeoFireUtils.getGeoHashForLocation(GeoLocation(lat, lng))
 
-            gymEditViewModel.gym.value?.address = hash
+            if (address != null) {
+                gymEditViewModel.gym.value?.address = address
+            }
+            gymEditViewModel.gym.value?.geohash = hash
             gymEditViewModel.gym.value?.coordinates = GeoPoint(lat, lng)
             isChanged = true
         }

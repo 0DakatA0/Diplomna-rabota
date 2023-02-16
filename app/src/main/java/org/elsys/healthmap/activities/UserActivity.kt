@@ -27,6 +27,7 @@ import com.google.android.gms.maps.model.MarkerOptions
 import kotlinx.coroutines.launch
 import org.elsys.healthmap.R
 import org.elsys.healthmap.databinding.ActivityUserBinding
+import org.elsys.healthmap.models.Gym
 import org.elsys.healthmap.repositories.GymsRepository
 import org.elsys.healthmap.ui.user.BottomSheetGymFragment
 import org.elsys.healthmap.ui.viewmodels.UserViewModel
@@ -117,7 +118,7 @@ class UserActivity : AppCompatActivity() {
                 lifecycleScope.launch {
                     it.clear()
 
-                    val gyms = GymsRepository.getGymsByLocation(center, radius)
+                    var gyms = GymsRepository.getGymsByLocation(center, radius)
 
                     Log.d("UserActivity", gyms.toString())
 
@@ -129,14 +130,13 @@ class UserActivity : AppCompatActivity() {
                             gyms.filter { gym ->
                                 val tags = gym.tags
                                 tags.forEach { tag ->
-
                                     if (tag.contains(search.substring(1))) return@filter true
                                 }
 
                                 return@filter false
                             }
                         } else {
-                            gyms.filter { gym ->
+                            gyms = gyms.filter { gym ->
                                 return@filter gym.name.contains(search)
                             }
                         }
@@ -153,13 +153,13 @@ class UserActivity : AppCompatActivity() {
                             .title(gym.name)
                             .icon(BitmapDescriptorFactory.defaultMarker(BitmapDescriptorFactory.HUE_AZURE))
 
-                        it.addMarker(markerOptions)
+                        it.addMarker(markerOptions)?.tag = gym
+                    }
 
-                        it.setOnMarkerClickListener {
-                            val modalBottomSheet = BottomSheetGymFragment(gym, viewModel)
-                            modalBottomSheet.show(supportFragmentManager, BottomSheetGymFragment.TAG)
-                            return@setOnMarkerClickListener true
-                        }
+                    it.setOnMarkerClickListener { marker ->
+                        val modalBottomSheet = BottomSheetGymFragment(marker.tag as Gym, viewModel)
+                        modalBottomSheet.show(supportFragmentManager, BottomSheetGymFragment.TAG)
+                        return@setOnMarkerClickListener true
                     }
                 }
             }

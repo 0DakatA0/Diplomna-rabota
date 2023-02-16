@@ -8,7 +8,7 @@
     <fragment
         android:id="@+id/gymsFragment"
         android:label="Gyms"
-        android:name="org.elsys.healthmap.ui.viewmodels.gym.GymsFragment"
+        android:name="org.elsys.healthmap.ui.gym.GymsFragment"
         tools:layout="@layout/fragment_gyms">
         <action
             android:id="@+id/action_gymsFragment_to_gymEditFragment"
@@ -20,7 +20,7 @@
     <fragment
         android:id="@+id/gymEditFragment"
         android:label="Edit Gym"
-        android:name="org.elsys.healthmap.ui.viewmodels.gym.GymEditFragment"
+        android:name="org.elsys.healthmap.ui.gym.GymEditFragment"
         tools:layout="@layout/fragment_gym_edit">
         <argument
             android:name="id"
@@ -34,13 +34,13 @@
     </fragment>
     <fragment
         android:id="@+id/addPriceTableElementFragment"
-        android:name="org.elsys.healthmap.ui.viewmodels.gym.AddPriceTableElementFragment"
+        android:name="org.elsys.healthmap.ui.gym.AddPriceTableElementFragment"
         android:label="Add Price Table Element"
         tools:layout="@layout/fragment_add_price_table_element">
     </fragment>
     <fragment
         android:id="@+id/pickAddressFragment"
-        android:name="org.elsys.healthmap.ui.viewmodels.gym.PickAddressFragment"
+        android:name="org.elsys.healthmap.ui.gym.PickAddressFragment"
         android:label="Pick Address"
         tools:layout="@layout/fragment_pick_address"
         />

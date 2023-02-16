@@ -9,7 +9,7 @@ import androidx.navigation.ui.setupActionBarWithNavController
 import com.google.android.gms.maps.MapFragment
 import org.elsys.healthmap.R
 import org.elsys.healthmap.databinding.ActivityGymOwnerBinding
-import org.elsys.healthmap.ui.viewmodels.gym.PickAddressFragment
+import org.elsys.healthmap.ui.gym.PickAddressFragment
 
 class GymOwnerActivity : AppCompatActivity() {
     private lateinit var navController: NavController

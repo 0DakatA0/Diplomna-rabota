@@ -28,11 +28,6 @@ class BottomSheetGymFragment(
         val binding = FragmentBottomsheetGymBinding.inflate(inflater, container, false)
         binding.gym = gym
 
-//        val bottomSheet = binding.bottomSheetView
-//        val sheetBehavior: BottomSheetBehavior<ConstraintLayout> = BottomSheetBehavior.from(bottomSheet)
-//        sheetBehavior.isFitToContents = true // the default
-//        sheetBehavior.peekHeight = 200
-
         val imagesAdapter = GymImagesBottomSheetAdapter(
             viewModel.viewModelScope,
             requireContext().cacheDir,

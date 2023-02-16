@@ -1,4 +1,4 @@
-package org.elsys.healthmap.ui.viewmodels.gym
+package org.elsys.healthmap.ui.gym
 
 import android.app.AlertDialog
 import android.content.Intent

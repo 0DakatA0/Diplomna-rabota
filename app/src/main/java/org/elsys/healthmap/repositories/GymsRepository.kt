@@ -43,7 +43,7 @@ class GymsRepository {
             val tasks: MutableList<Task<QuerySnapshot>> = ArrayList()
             for (b in bounds) {
                 val q = db.collection("gyms")
-                    .orderBy("address")
+                    .orderBy("geohash")
                     .startAt(b.startHash)
                     .endAt(b.endHash)
 

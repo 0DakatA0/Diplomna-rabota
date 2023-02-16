@@ -1,8 +1,9 @@
-package org.elsys.healthmap.ui.viewmodels.gym
+package org.elsys.healthmap.ui.gym
 
 import android.Manifest.permission.ACCESS_FINE_LOCATION
 import android.annotation.SuppressLint
 import android.content.pm.PackageManager
+import android.location.Geocoder
 import android.location.Location
 import android.location.LocationManager
 import android.os.Bundle
@@ -81,9 +82,21 @@ class PickAddressFragment : Fragment() {
             map.getMapAsync {
                 val center = it.cameraPosition.target
 
+                // TODO: Make it asynchronous
+
+                val address = Geocoder(requireContext()).getFromLocation(
+                    center.latitude,
+                    center.longitude,
+                    1
+                )?.get(0)?.getAddressLine(0)
+
                 setFragmentResult(
                     "PICK_ADDRESS",
-                    bundleOf("latitude" to center.latitude, "longitude" to center.longitude)
+                    bundleOf(
+                        "latitude" to center.latitude,
+                        "longitude" to center.longitude,
+                        "address" to address
+                    )
                 )
                 findNavController().popBackStack()
             }
