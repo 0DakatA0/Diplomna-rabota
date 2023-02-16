@@ -25,6 +25,8 @@ class BottomSheetGymFragment(
         container: ViewGroup?,
         savedInstanceState: Bundle?
     ): View {
+        // TODO reuse old adapters
+
         val binding = FragmentBottomsheetGymBinding.inflate(inflater, container, false)
         binding.gym = gym
 

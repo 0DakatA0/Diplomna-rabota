@@ -11,6 +11,7 @@ import android.util.Log
 import android.view.Menu
 import android.view.MenuInflater
 import android.view.MenuItem
+import androidx.activity.setViewTreeOnBackPressedDispatcherOwner
 import androidx.activity.viewModels
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.app.ActivityCompat
@@ -116,6 +117,8 @@ class UserActivity : AppCompatActivity() {
                     )
 
                 lifecycleScope.launch {
+                    //TODO Smart clear
+
                     it.clear()
 
                     var gyms = GymsRepository.getGymsByLocation(center, radius)
@@ -125,8 +128,10 @@ class UserActivity : AppCompatActivity() {
                     val searchBar = binding.searchBar
                     val search = searchBar.query.toString()
 
+                    //TODO search listener
+
                     if(search.isNotEmpty()) {
-                        if (search[0] == '#') {
+                        gyms = if (search[0] == '#') {
                             gyms.filter { gym ->
                                 val tags = gym.tags
                                 tags.forEach { tag ->
@@ -136,7 +141,7 @@ class UserActivity : AppCompatActivity() {
                                 return@filter false
                             }
                         } else {
-                            gyms = gyms.filter { gym ->
+                            gyms.filter { gym ->
                                 return@filter gym.name.contains(search)
                             }
                         }
