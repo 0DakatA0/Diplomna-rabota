@@ -34,21 +34,17 @@ class LogInFragment : Fragment() {
                 val loggedIn = auth.signInWithEmailAndPassword(email, password).await()
 
                 if (loggedIn.user != null) {
-                    val role = loggedIn.user!!.getIdToken(true).await().claims
-
-                    Log.d("LogIn", "Logged in as $role")
-
-                    val intent =
-                        when (role["role"]) {
-                            "gymOwner" -> Intent(requireContext(), GymOwnerActivity::class.java)
-                            else -> Intent(requireContext(), UserActivity::class.java)
-                        }
-
+                    val intent = Intent(context, GymOwnerActivity::class.java)
                     startActivity(intent)
                 } else {
                     Log.d("LogIn", "Failed to log in")
                 }
             }
+        }
+
+        binding.goToUserActivityButton.setOnClickListener {
+            val intent = Intent(context, UserActivity::class.java)
+            startActivity(intent)
         }
 
         binding.goToSignUpText.setOnClickListener {

@@ -34,6 +34,7 @@ class GymImagesAdapter (
             if(!file.exists()) {
                 scope.launch {
                     dataset.value?.get(position)?.let { ImagesRepository.getImage(it, file) }
+                    if(holder.adapterPosition != position) return@launch
                     holder.binding.root.setImageURI(file.toUri())
                 }
             } else {

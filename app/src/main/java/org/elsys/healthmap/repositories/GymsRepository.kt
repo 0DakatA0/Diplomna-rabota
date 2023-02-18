@@ -38,7 +38,7 @@ class GymsRepository {
 
         }
 
-        suspend fun getGymsByLocation(center: GeoLocation, radius: Double): List<Gym> {
+        fun getGymsByLocation(center: GeoLocation, radius: Double, onUpdateData: (List<Gym>) -> Unit) {
             val bounds = GeoFireUtils.getGeoHashQueryBounds(center, radius)
             val tasks: MutableList<Task<QuerySnapshot>> = ArrayList()
             for (b in bounds) {
@@ -53,28 +53,29 @@ class GymsRepository {
             val matchingDocs: MutableList<DocumentSnapshot> = ArrayList()
             val gyms: MutableList<Gym> = mutableListOf()
 
-            val results = Tasks.whenAllComplete(tasks).await()
-            for (task in results) {
-                val snap = task.result as QuerySnapshot
-                for (doc in snap) {
-                    val coordinates  = doc.getGeoPoint("coordinates")
+            Tasks.whenAllComplete(tasks).addOnCompleteListener { results ->
+                for (task in results.result!!){
+                    val snap = task.result as QuerySnapshot
+                    for (doc in snap) {
+                        val coordinates  = doc.getGeoPoint("coordinates")
 
-                    val lat = coordinates?.latitude!!
-                    val lng = coordinates?.longitude!!
+                        val lat = coordinates?.latitude!!
+                        val lng = coordinates?.longitude!!
 
-                    val docLocation = GeoLocation(lat, lng)
-                    val distanceInM = GeoFireUtils.getDistanceBetween(docLocation, center)
-                    if (distanceInM <= radius) {
-                        matchingDocs.add(doc)
+                        val docLocation = GeoLocation(lat, lng)
+                        val distanceInM = GeoFireUtils.getDistanceBetween(docLocation, center)
+                        if (distanceInM <= radius) {
+                            matchingDocs.add(doc)
+                        }
                     }
                 }
-            }
 
-            matchingDocs.forEach {
-                it.toObject(Gym::class.java)?.let { it1 -> gyms.add(it1) }
-            }
+                matchingDocs.forEach {
+                    it.toObject(Gym::class.java)?.let { it1 -> gyms.add(it1) }
+                }
 
-            return gyms
+                onUpdateData(gyms)
+            }
         }
 
         suspend fun getGym(id: String): Gym? {

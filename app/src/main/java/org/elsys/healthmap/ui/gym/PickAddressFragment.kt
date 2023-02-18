@@ -3,13 +3,17 @@ package org.elsys.healthmap.ui.gym
 import android.Manifest.permission.ACCESS_FINE_LOCATION
 import android.annotation.SuppressLint
 import android.content.pm.PackageManager
+import android.location.Address
 import android.location.Geocoder
 import android.location.Location
 import android.location.LocationManager
+import android.os.Build
 import android.os.Bundle
+import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import androidx.annotation.RequiresApi
 import androidx.core.app.ActivityCompat
 import androidx.core.content.ContextCompat
 import androidx.core.content.ContextCompat.getSystemService
@@ -68,6 +72,7 @@ class PickAddressFragment : Fragment() {
             })
     }
 
+    @RequiresApi(Build.VERSION_CODES.TIRAMISU)
     override fun onCreateView(
         inflater: LayoutInflater,
         container: ViewGroup?,
@@ -78,27 +83,33 @@ class PickAddressFragment : Fragment() {
         map = childFragmentManager.findFragmentById(R.id.mapPicker) as SupportMapFragment
         getLocation()
 
+        // TODO: Version based query
+
         binding.pickAddressButton.setOnClickListener {
             map.getMapAsync {
                 val center = it.cameraPosition.target
 
-                // TODO: Make it asynchronous
-
-                val address = Geocoder(requireContext()).getFromLocation(
+                Geocoder(requireContext()).getFromLocation(
                     center.latitude,
                     center.longitude,
                     1
-                )?.get(0)?.getAddressLine(0)
+                ) { addresses ->
+                    if (addresses.isNotEmpty()) {
+                        val address = addresses[0].getAddressLine(0).split(",")[0]
 
-                setFragmentResult(
-                    "PICK_ADDRESS",
-                    bundleOf(
-                        "latitude" to center.latitude,
-                        "longitude" to center.longitude,
-                        "address" to address
-                    )
-                )
-                findNavController().popBackStack()
+                        Log.d("ADDRESS", address)
+
+                        setFragmentResult(
+                            "PICK_ADDRESS",
+                            bundleOf(
+                                "latitude" to center.latitude,
+                                "longitude" to center.longitude,
+                                "address" to address
+                            )
+                        )
+                        findNavController().popBackStack()
+                    }
+                }
             }
         }
 

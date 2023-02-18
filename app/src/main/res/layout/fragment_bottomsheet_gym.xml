@@ -34,6 +34,20 @@
                 app:layout_constraintTop_toTopOf="parent"
                 app:layout_constraintVertical_bias="0.002" />
 
+            <TextView
+                android:id="@+id/gymAddressBottomSheet"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_margin="15dp"
+                android:text="@{gym.address}"
+                android:textSize="30sp"
+                app:layout_constraintBottom_toBottomOf="parent"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintHorizontal_bias="0.551"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toBottomOf="@id/gymNameBottomSheet"
+                app:layout_constraintVertical_bias="0.002" />
+
             <androidx.recyclerview.widget.RecyclerView
                 android:id="@+id/gymImagesRecyclerViewBottomSheet"
                 android:layout_width="0dp"
@@ -45,7 +59,7 @@
                 app:layout_constraintEnd_toEndOf="parent"
                 app:layout_constraintHorizontal_bias="0.0"
                 app:layout_constraintStart_toStartOf="parent"
-                app:layout_constraintTop_toBottomOf="@+id/gymNameBottomSheet"
+                app:layout_constraintTop_toBottomOf="@+id/gymAddressBottomSheet"
                 app:layout_constraintVertical_bias="0.0"
                 tools:listitem="@layout/item_gym_picture" />
             <TextView

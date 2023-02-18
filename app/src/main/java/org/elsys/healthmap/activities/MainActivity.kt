@@ -16,16 +16,9 @@ class MainActivity : AppCompatActivity() {
         val auth = Firebase.auth
 
         if (auth.currentUser == null) {
-            startActivity(Intent(this@MainActivity, AuthenticationActivity::class.java))
+            startActivity(Intent(this@MainActivity, UserActivity::class.java))
         } else {
-            lifecycleScope.launch {
-                val intent = when (auth.currentUser!!.getIdToken(true).await().claims["role"] as String?) {
-                    "gymOwner" -> Intent(this@MainActivity, GymOwnerActivity::class.java)
-                    else -> Intent(this@MainActivity, UserActivity::class.java)
-                }
-
-                startActivity(intent)
-            }
+            startActivity(Intent(this@MainActivity, GymOwnerActivity::class.java))
         }
 
         finish()

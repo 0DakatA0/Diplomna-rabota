@@ -7,19 +7,18 @@ import android.content.pm.PackageManager
 import android.location.Location
 import android.location.LocationManager
 import android.os.Bundle
-import android.util.Log
 import android.view.Menu
-import android.view.MenuInflater
 import android.view.MenuItem
-import androidx.activity.setViewTreeOnBackPressedDispatcherOwner
 import androidx.activity.viewModels
 import androidx.appcompat.app.AppCompatActivity
+import androidx.appcompat.widget.SearchView
 import androidx.core.app.ActivityCompat
 import androidx.core.content.ContextCompat
 import androidx.lifecycle.lifecycleScope
 import com.firebase.geofire.GeoLocation
 import com.google.android.gms.maps.CameraUpdateFactory.newLatLngZoom
 import com.google.android.gms.maps.GoogleMap
+import com.google.android.gms.maps.OnMapReadyCallback
 import com.google.android.gms.maps.SupportMapFragment
 import com.google.android.gms.maps.model.BitmapDescriptorFactory
 import com.google.android.gms.maps.model.LatLng
@@ -34,7 +33,7 @@ import org.elsys.healthmap.ui.user.BottomSheetGymFragment
 import org.elsys.healthmap.ui.viewmodels.UserViewModel
 import kotlin.math.cos
 
-class UserActivity : AppCompatActivity() {
+class UserActivity : AppCompatActivity(), OnMapReadyCallback {
 
     private lateinit var locationManager: LocationManager
     private lateinit var map: SupportMapFragment
@@ -42,7 +41,7 @@ class UserActivity : AppCompatActivity() {
     private val viewModel: UserViewModel by viewModels()
 
     @SuppressLint("MissingPermission")
-    private fun getLocation() {
+    private fun getLocation(map: GoogleMap) {
         locationManager = ContextCompat.getSystemService(
             this,
             LocationManager::class.java
@@ -65,14 +64,12 @@ class UserActivity : AppCompatActivity() {
             5f,
             object : android.location.LocationListener {
                 override fun onLocationChanged(location: Location) {
-                    map.getMapAsync {
-                        it.moveCamera(
-                            newLatLngZoom(
-                                LatLng(location.latitude, location.longitude),
-                                16f
-                            )
+                    map.moveCamera(
+                        newLatLngZoom(
+                            LatLng(location.latitude, location.longitude),
+                            16f
                         )
-                    }
+                    )
                 }
 
                 override fun onStatusChanged(provider: String?, status: Int, extras: Bundle?) {}
@@ -93,6 +90,24 @@ class UserActivity : AppCompatActivity() {
         return groundResolution * mapWidth!! / 2
     }
 
+    private fun updateMarkers(gyms: List<Gym>, map: GoogleMap) {
+        map.clear()
+
+        gyms.forEach { gym ->
+            val markerOptions = MarkerOptions()
+                .position(
+                    LatLng(
+                        gym.coordinates.latitude,
+                        gym.coordinates.longitude
+                    )
+                )
+                .title(gym.name)
+                .icon(BitmapDescriptorFactory.defaultMarker(BitmapDescriptorFactory.HUE_AZURE))
+
+            map.addMarker(markerOptions)?.tag = gym
+        }
+    }
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         val binding = ActivityUserBinding.inflate(layoutInflater)
@@ -103,72 +118,7 @@ class UserActivity : AppCompatActivity() {
             .add(R.id.map, map)
             .commit()
 
-        getLocation()
-
-        map.getMapAsync {
-            it.setMapStyle(MapStyleOptions(resources.getString(R.string.style_json)))
-
-            it.setOnCameraIdleListener {
-                val radius = calculateRadius(it)
-                val center =
-                    GeoLocation(
-                        it.cameraPosition.target.latitude,
-                        it.cameraPosition.target.longitude
-                    )
-
-                lifecycleScope.launch {
-                    //TODO Smart clear
-
-                    it.clear()
-
-                    var gyms = GymsRepository.getGymsByLocation(center, radius)
-
-                    Log.d("UserActivity", gyms.toString())
-
-                    val searchBar = binding.searchBar
-                    val search = searchBar.query.toString()
-
-                    //TODO search listener
-
-                    if(search.isNotEmpty()) {
-                        gyms = if (search[0] == '#') {
-                            gyms.filter { gym ->
-                                val tags = gym.tags
-                                tags.forEach { tag ->
-                                    if (tag.contains(search.substring(1))) return@filter true
-                                }
-
-                                return@filter false
-                            }
-                        } else {
-                            gyms.filter { gym ->
-                                return@filter gym.name.contains(search)
-                            }
-                        }
-                    }
-
-                    gyms.forEach { gym ->
-                        val markerOptions = MarkerOptions()
-                            .position(
-                                LatLng(
-                                    gym.coordinates.latitude,
-                                    gym.coordinates.longitude
-                                )
-                            )
-                            .title(gym.name)
-                            .icon(BitmapDescriptorFactory.defaultMarker(BitmapDescriptorFactory.HUE_AZURE))
-
-                        it.addMarker(markerOptions)?.tag = gym
-                    }
-
-                    it.setOnMarkerClickListener { marker ->
-                        val modalBottomSheet = BottomSheetGymFragment(marker.tag as Gym, viewModel)
-                        modalBottomSheet.show(supportFragmentManager, BottomSheetGymFragment.TAG)
-                        return@setOnMarkerClickListener true
-                    }
-                }
-            }
-        }
+        map.getMapAsync(this)
 
         setContentView(binding.root)
     }
@@ -185,6 +135,55 @@ class UserActivity : AppCompatActivity() {
                 true
             }
             else -> super.onOptionsItemSelected(item)
+        }
+    }
+
+    override fun onMapReady(map: GoogleMap) {
+        getLocation(map)
+        map.setMapStyle(MapStyleOptions(resources.getString(R.string.style_json)))
+
+        viewModel.gyms.observe(this@UserActivity) { gyms ->
+            updateMarkers(gyms, map)
+        }
+
+        val searchBar = findViewById<SearchView>(R.id.searchBar)
+
+        map.setOnMarkerClickListener { marker ->
+            val modalBottomSheet = BottomSheetGymFragment(marker.tag as Gym)
+            modalBottomSheet.show(supportFragmentManager, BottomSheetGymFragment.TAG)
+            return@setOnMarkerClickListener true
+        }
+
+        searchBar.setOnQueryTextListener(object : SearchView.OnQueryTextListener {
+            override fun onQueryTextSubmit(query: String?): Boolean {
+                return true
+            }
+
+            override fun onQueryTextChange(newText: String?): Boolean {
+                val radius = calculateRadius(map)
+                val center =
+                    GeoLocation(
+                        map.cameraPosition.target.latitude,
+                        map.cameraPosition.target.longitude
+                    )
+
+                viewModel.getGyms(center, radius, newText!!)
+
+                return true
+            }
+        })
+
+        map.setOnCameraIdleListener {
+            val search = searchBar.query.toString()
+
+            val radius = calculateRadius(map)
+            val center =
+                GeoLocation(
+                    map.cameraPosition.target.latitude,
+                    map.cameraPosition.target.longitude
+                )
+
+            viewModel.getGyms(center, radius, search)
         }
     }
 }
