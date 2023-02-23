@@ -112,12 +112,7 @@ class UserActivity : AppCompatActivity(), OnMapReadyCallback {
         super.onCreate(savedInstanceState)
         val binding = ActivityUserBinding.inflate(layoutInflater)
 
-        map = SupportMapFragment.newInstance()
-        supportFragmentManager
-            .beginTransaction()
-            .add(R.id.map, map)
-            .commit()
-
+        map = supportFragmentManager.findFragmentById(R.id.map) as SupportMapFragment
         map.getMapAsync(this)
 
         setContentView(binding.root)

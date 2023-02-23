@@ -2,20 +2,13 @@ package org.elsys.healthmap.ui.authentication
 
 import android.content.Intent
 import android.os.Bundle
-import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
-import android.widget.AdapterView
-import android.widget.ArrayAdapter
 import androidx.fragment.app.Fragment
-import androidx.lifecycle.lifecycleScope
 import com.google.firebase.auth.ktx.auth
 import com.google.firebase.ktx.Firebase
-import kotlinx.coroutines.launch
-import kotlinx.coroutines.tasks.await
 import org.elsys.healthmap.activities.GymOwnerActivity
-import org.elsys.healthmap.activities.UserActivity
 import org.elsys.healthmap.databinding.FragmentSignUpBinding
 
 class SignUpFragment : Fragment() {
@@ -34,16 +27,30 @@ class SignUpFragment : Fragment() {
         button.setOnClickListener {
             val email = binding.signUpEmail.text.toString()
             val password = binding.signUpPassword.text.toString()
+            val confirmPassword = binding.signUpConfirmPassword.text.toString()
 
-            lifecycleScope.launch {
-                val signUp = auth.createUserWithEmailAndPassword(email, password).await()
+            if(email.isEmpty()) {
+                binding.signUpEmail.error = "Email is required"
+                return@setOnClickListener
+            }
 
-                if (signUp.user != null) {
-                    val intent = Intent(context, GymOwnerActivity::class.java)
-                    startActivity(intent)
-                } else {
-                    Log.d("SignUp", "Failed to sign up")
-                }
+            if(password.isEmpty()) {
+                binding.signUpPassword.error = "Password is required"
+                return@setOnClickListener
+            }
+
+            if(password.length < 6) {
+                binding.signUpPassword.error = "Password must be at least 6 characters long"
+                return@setOnClickListener
+            }
+
+            if (password != confirmPassword) {
+                binding.signUpConfirmPassword.error = "Passwords do not match"
+                return@setOnClickListener
+            }
+
+            auth.createUserWithEmailAndPassword(email, password).addOnSuccessListener {
+                startActivity(Intent(context, GymOwnerActivity::class.java))
             }
         }
 

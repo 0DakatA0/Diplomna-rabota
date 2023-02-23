@@ -28,7 +28,21 @@ class AddPriceTableElementFragment : Fragment() {
 
         btn.setOnClickListener {
             val product = binding.productName.text.toString()
-            val price = binding.productPrice.text.toString().toFloat()
+            val price = binding.productPrice.text.toString().toDoubleOrNull()
+
+            if (product.isBlank()) {
+                binding.productName.error = "Product name is required"
+            }
+
+            if (price == null) {
+                binding.productPrice.error = "Product price is required"
+                return@setOnClickListener
+            }
+
+            if (price <= 0) {
+                binding.productPrice.error = "Product price must be relevant"
+                return@setOnClickListener
+            }
 
             setFragmentResult(
                 "ADD_PRICE_TABLE_ELEMENT",

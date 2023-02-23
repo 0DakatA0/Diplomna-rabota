@@ -31,13 +31,24 @@ class LogInFragment : Fragment() {
                 val email = binding.loginUsernameEmail.text.toString()
                 val password = binding.logInPassword.text.toString()
 
-                val loggedIn = auth.signInWithEmailAndPassword(email, password).await()
+                if (email.isBlank()) {
+                    binding.loginUsernameEmail.error = "Email is required"
+                    return@launch
+                }
 
-                if (loggedIn.user != null) {
-                    val intent = Intent(context, GymOwnerActivity::class.java)
-                    startActivity(intent)
-                } else {
-                    Log.d("LogIn", "Failed to log in")
+                if(password.isBlank()) {
+                    binding.logInPassword.error = "Password is required"
+                    return@launch
+                }
+
+                auth.signInWithEmailAndPassword(email, password).addOnSuccessListener {
+                    startActivity(Intent(context, GymOwnerActivity::class.java))
+                }.addOnFailureListener {
+                    if(it.message!!.contains("password")) {
+                        binding.logInPassword.error = "Wrong password"
+                    } else {
+                        binding.loginUsernameEmail.error = "Wrong email"
+                    }
                 }
             }
         }
