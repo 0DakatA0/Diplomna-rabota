@@ -12,6 +12,8 @@ import org.elsys.healthmap.activities.GymOwnerActivity
 import org.elsys.healthmap.databinding.FragmentSignUpBinding
 
 class SignUpFragment : Fragment() {
+    // FIXME this var should be nullable and set to null in onDestroyView(), otherwise might
+    //  leak the context used to create the views stored in the binding
     private lateinit var binding: FragmentSignUpBinding
 
     override fun onCreateView(

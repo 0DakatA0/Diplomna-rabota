@@ -37,15 +37,28 @@ class UserActivity : AppCompatActivity(), OnMapReadyCallback {
 
     private lateinit var locationManager: LocationManager
     private lateinit var map: SupportMapFragment
+    // FIXME make this a constant
     private val locationPermissionCode = 2
     private val viewModel: UserViewModel by viewModels()
 
     @SuppressLint("MissingPermission")
     private fun getLocation(map: GoogleMap) {
+        // FIXME Normally you would extract location-related logic in a separate class
+        //  that hides the implementation details and exposes location updates as a LiveData, Flow,
+        //  or something similar. You are using similar logic in another place, so you might
+        //  consider doing this in this project as well
         locationManager = ContextCompat.getSystemService(
             this,
             LocationManager::class.java
         )!!
+
+        // FIXME permissions should be checked and requested at app startup
+        //  I see that you are requesting them, but you are not checking whether the user
+        //  has granted them anywhere. You should implement onRequestPermissionsResult(...)
+        //  and handle the results.
+        //  Alternatively (since this approach has been deprecated recently), you can use the modern
+        //  approach with activity result contracts. See https://developer.android.com/training/permissions/requesting#request-permission
+        //  for more details
         if ((ContextCompat.checkSelfPermission(
                 this,
                 Manifest.permission.ACCESS_FINE_LOCATION
@@ -79,6 +92,7 @@ class UserActivity : AppCompatActivity(), OnMapReadyCallback {
     }
 
     private fun calculateRadius(googleMap: GoogleMap): Double {
+        // FIXME make this a constant
         val earthRadius = 6378137.0
         val mapWidth = map.view?.width
         val zoomLevel = googleMap.cameraPosition.zoom
@@ -87,6 +101,7 @@ class UserActivity : AppCompatActivity(), OnMapReadyCallback {
                 2.0,
                 zoomLevel.toDouble()
             ))
+        // FIXME don't use !!, return 0 or Double.NaN if you don't have meaningful view width
         return groundResolution * mapWidth!! / 2
     }
 
@@ -137,15 +152,19 @@ class UserActivity : AppCompatActivity(), OnMapReadyCallback {
         getLocation(map)
         map.setMapStyle(MapStyleOptions(resources.getString(R.string.style_json)))
 
+        // FIXME you don't have to use a label (@UserActivity) here
         viewModel.gyms.observe(this@UserActivity) { gyms ->
             updateMarkers(gyms, map)
         }
 
+        // FIXME you are using bindings, so you don't have to use findViewById
+        //  store the binding in a member val and use it here to access the search bar
         val searchBar = findViewById<SearchView>(R.id.searchBar)
 
         map.setOnMarkerClickListener { marker ->
             val modalBottomSheet = BottomSheetGymFragment(marker.tag as Gym)
             modalBottomSheet.show(supportFragmentManager, BottomSheetGymFragment.TAG)
+            // FIXME you can omit the return keyword here, the last statement will be used as a return value
             return@setOnMarkerClickListener true
         }
 
@@ -162,6 +181,8 @@ class UserActivity : AppCompatActivity(), OnMapReadyCallback {
                         map.cameraPosition.target.longitude
                     )
 
+                // FIXME don't use !!, either change the signature of getGyms to accept nullable
+                //  strings or pass an empty string in case newText is null
                 viewModel.getGyms(center, radius, newText!!)
 
                 return true

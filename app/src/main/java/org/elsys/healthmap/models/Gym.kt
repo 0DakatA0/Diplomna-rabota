@@ -2,6 +2,10 @@ package org.elsys.healthmap.models
 
 import com.google.firebase.firestore.GeoPoint
 
+
+// FIXME Using mutable fields in data classes is generally not recommended
+//  Data classes have a very handy .copy() method that allow easy modification
+//  so for example if you want to add a photo you can do something like gym.copy(photos = gym.photos + "new photo")
 data class Gym(
     var name: String,
     var photos: MutableList<String>,

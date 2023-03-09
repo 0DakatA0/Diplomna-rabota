@@ -20,6 +20,8 @@ import java.io.FileOutputStream
 
 class GymEditViewModel : ViewModel() {
 
+    // FIXME field initialization happens in declaration order, move this declaration
+    //  below the declarations of the fields that are accessed in the launch block
     var gymId: String? = null
         set(value) {
             if(value == field) return
@@ -48,10 +50,13 @@ class GymEditViewModel : ViewModel() {
     val priceTable: LiveData<Map<String, Float>>
         get() = _priceTable
 
+    // FIXME instead of exposing suspending function use viewModelScope here to do the job
     suspend fun saveGym() {
+        // FIXME use meaningful names for all lambda params when having a nested one
         gymId?.let { _gym.value?.let { it1 -> GymsRepository.saveGym(it, it1) } }
     }
 
+    // FIXME instead of exposing suspending function use viewModelScope here to do the job
     suspend fun addPhoto(uri: Uri, contentResolver: ContentResolver, cacheDir: File) {
         val imgName = ImagesRepository.uploadImage(uri, contentResolver, cacheDir)
 
@@ -60,9 +65,11 @@ class GymEditViewModel : ViewModel() {
         _photos.value = newPhotos
     }
 
+    // FIXME instead of exposing suspending function use viewModelScope here to do the job
     suspend fun deletePhoto(photo: String, cacheDir: File) {
         ImagesRepository.deleteImage(photo, cacheDir)
-
+        // FIXME prefer to use immutable collections, this cast here makes an assumption
+        //  that might not be true
         val newPhotos = _photos.value as MutableList<String>
         newPhotos.remove(photo)
         _photos.value = newPhotos
@@ -70,12 +77,15 @@ class GymEditViewModel : ViewModel() {
 
     fun addPriceTableElement(bundle: Bundle) {
         val newPriceTable = _priceTable.value as MutableMap<String, Float>
+        // FIXME have a constant for the keys and don't use !!, verify that the input is valid instead
         newPriceTable[bundle.getString("product")!!] = bundle.getFloat("price")
         _priceTable.value = newPriceTable
         _gym.value?.priceTable = newPriceTable
     }
 
     fun deletePriceTableElement(product: String) {
+        // FIXME prefer to use immutable collections, this cast here makes an assumption
+        //  that might not be true
         val newPriceTable = _priceTable.value as MutableMap<String, Float>
         newPriceTable.remove(product)
         _priceTable.value = newPriceTable

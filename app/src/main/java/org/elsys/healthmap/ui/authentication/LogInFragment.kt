@@ -11,6 +11,7 @@ import androidx.lifecycle.lifecycleScope
 import androidx.navigation.fragment.findNavController
 import com.google.firebase.auth.ktx.auth
 import com.google.firebase.ktx.Firebase
+import com.google.firebase.ktx.app
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.tasks.await
 import org.elsys.healthmap.activities.GymOwnerActivity
@@ -18,6 +19,8 @@ import org.elsys.healthmap.activities.UserActivity
 import org.elsys.healthmap.databinding.FragmentLogInBinding
 
 class LogInFragment : Fragment() {
+    // FIXME this var should be nullable and set to null in onDestroyView(), otherwise might
+    //  leak the context used to create the views stored in the binding
     private lateinit var binding: FragmentLogInBinding
 
     override fun onCreateView(
@@ -26,6 +29,8 @@ class LogInFragment : Fragment() {
         binding = FragmentLogInBinding.inflate(inflater, container, false)
 
         binding.logInButton.setOnClickListener {
+            // FIXME you might want to have a ViewModel to handle the login logic
+            //  What's the purpose of having a coroutine here?
             lifecycleScope.launch {
                 val auth = Firebase.auth
                 val email = binding.loginUsernameEmail.text.toString()
@@ -41,6 +46,11 @@ class LogInFragment : Fragment() {
                     return@launch
                 }
 
+                // FIXME The fragment/activity might have been removed when the onSuccess/onFailure
+                //  listeners get invoked, so passing context and binding directly in the callbacks
+                //  might lead to leaks. One way to avoid this is to have a member val MutableLiveData<Result>
+                //  that you can update with success/error result. Then you can observe this livedata
+                //  safely and take the appropriate action on update
                 auth.signInWithEmailAndPassword(email, password).addOnSuccessListener {
                     startActivity(Intent(context, GymOwnerActivity::class.java))
                 }.addOnFailureListener {
@@ -65,4 +75,5 @@ class LogInFragment : Fragment() {
 
         return binding.root
     }
+
 }

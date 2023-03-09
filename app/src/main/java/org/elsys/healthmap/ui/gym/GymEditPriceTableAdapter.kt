@@ -7,6 +7,9 @@ import androidx.recyclerview.widget.RecyclerView
 import org.elsys.healthmap.databinding.ItemPriceTableBinding
 
 class GymEditPriceTableAdapter(
+    // FIXME do not use LiveData here, you will not be able to handle updates properly
+    //  Observe the LiveData in the fragment/activity then pass the actual data that you want
+    //  to display to the adapter by invoking an update function
     private val dataset: LiveData<Map<String, Float>>,
     private val delete: (String) -> Unit,
 ) : RecyclerView.Adapter<GymEditPriceTableAdapter.PriceTableViewHolder>() {
@@ -33,6 +36,7 @@ class GymEditPriceTableAdapter(
             if (item != null) {
                 delete(item.first)
             }
+            // FIXME omit the return keyword
             return@setOnLongClickListener true
         }
     }
