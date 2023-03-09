@@ -11,6 +11,7 @@ import java.io.File
 import java.io.FileOutputStream
 import java.util.*
 
+// FIXME same general remarks as for GymsRepository
 class ImagesRepository {
     companion object {
         private val storageRef = Firebase.storage.reference
@@ -24,8 +25,8 @@ class ImagesRepository {
         suspend fun uploadImage(uri: Uri, contentResolver: ContentResolver, cacheDir: File): String {
             val imageName = UUID.randomUUID().toString()
             val imageRef = storageRef.child(imageName)
-
             withContext(Dispatchers.IO) {
+                // FIXME this call might throw FileNotFoundException, use in a try block
                 val inputStream = contentResolver.openInputStream(uri)
                 val file = File(cacheDir, imageName)
                 val outputStream = FileOutputStream(file)

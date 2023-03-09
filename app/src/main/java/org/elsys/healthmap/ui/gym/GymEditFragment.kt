@@ -35,6 +35,7 @@ class GymEditFragment : Fragment() {
     private val pickMedia =
         registerForActivityResult(ActivityResultContracts.PickVisualMedia()) { uri ->
             if (uri != null) {
+                // FIXME handle time-consuming operations in the ViewModel
                 lifecycleScope.launch {
                     gymEditViewModel.addPhoto(
                         uri,
@@ -58,12 +59,17 @@ class GymEditFragment : Fragment() {
             requireContext().cacheDir,
             gymEditViewModel.viewModelScope
         ) {
+            // FIXME handle time-consuming operations in the ViewModel
             gymEditViewModel.viewModelScope.launch {
                 gymEditViewModel.deletePhoto(it, requireContext().cacheDir)
             }
         }
 
         gymEditViewModel.photos.observe(viewLifecycleOwner) {
+            // FIXME there is a more graceful way to update adapter data, see
+            //  https://blog.mindorks.com/the-powerful-tool-diff-util-in-recyclerview-android-tutorial/
+            //  for an example
+            //  This comment applies to all adapter updates in the project
             adapter.notifyDataSetChanged()
         }
 
@@ -81,6 +87,7 @@ class GymEditFragment : Fragment() {
             findNavController().navigate(action)
         }
 
+        // FIXME declare constants for all keys here
         setFragmentResultListener("PICK_ADDRESS") { _, bundle ->
             val lat = bundle.getDouble("latitude")
             val lng = bundle.getDouble("longitude")
@@ -103,6 +110,7 @@ class GymEditFragment : Fragment() {
         }
 
         gymEditViewModel.priceTable.observe(viewLifecycleOwner) {
+            // FIXME same as above
             priceTable.adapter?.notifyDataSetChanged()
         }
 
@@ -167,6 +175,7 @@ class GymEditFragment : Fragment() {
     override fun onStop() {
         super.onStop()
 
+        // FIXME handle time-consuming operations in the ViewModel
         gymEditViewModel.viewModelScope.launch {
             if (isChanged) {
                 gymEditViewModel.saveGym()

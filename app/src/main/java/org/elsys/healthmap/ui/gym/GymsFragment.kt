@@ -30,6 +30,9 @@ class GymsFragment : Fragment() {
         val addGymButton = binding.addGymButton
 
         addGymButton.setOnClickListener {
+            // FIXME this looks a bit fishy, normally the ViewModel should have all the knowledge
+            //  on how to create a new gym (meaning you should only call createGym()), then once
+            //  the gym has been created the UI should be notified and the user redirected
             viewModel.viewModelScope.launch {
                 val gym = Gym()
                 val id = UUID.randomUUID().toString()
@@ -44,6 +47,7 @@ class GymsFragment : Fragment() {
             val builder = AlertDialog.Builder(context)
 
             builder.apply {
+                // FIXME avoid hardcoding strings in the app, use the platform string resources
                 setPositiveButton("Yes") { _, _ ->
                     viewModel.viewModelScope.launch {
                         viewModel.deleteGym(it)
@@ -53,6 +57,7 @@ class GymsFragment : Fragment() {
 
                 }
             }
+            // FIXME typo in the text - shore
             builder.setMessage("Are you shore that you want to delete that gym?")
             builder.create().show()
         }
@@ -60,6 +65,7 @@ class GymsFragment : Fragment() {
         recyclerView.setHasFixedSize(false)
 
         gyms.observe(viewLifecycleOwner) {
+            // FIXME check DiffUtil
             adapter.notifyDataSetChanged()
         }
 
@@ -68,6 +74,8 @@ class GymsFragment : Fragment() {
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
+        // FIXME There is a new way to create menus with a MenuProvider, you might check it if you
+        //  have time
         setHasOptionsMenu(true)
     }
 

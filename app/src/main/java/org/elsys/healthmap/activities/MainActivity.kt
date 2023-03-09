@@ -15,6 +15,7 @@ class MainActivity : AppCompatActivity() {
         super.onCreate(savedInstanceState)
         val auth = Firebase.auth
 
+        // FIXME use just this without the label @MainActivity
         if (auth.currentUser == null) {
             startActivity(Intent(this@MainActivity, UserActivity::class.java))
         } else {

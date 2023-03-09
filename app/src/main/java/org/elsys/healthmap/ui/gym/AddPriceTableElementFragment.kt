@@ -44,6 +44,7 @@ class AddPriceTableElementFragment : Fragment() {
                 return@setOnClickListener
             }
 
+            // FIXME declare constants for all keys here
             setFragmentResult(
                 "ADD_PRICE_TABLE_ELEMENT",
                 bundleOf("product" to product, "price" to price)

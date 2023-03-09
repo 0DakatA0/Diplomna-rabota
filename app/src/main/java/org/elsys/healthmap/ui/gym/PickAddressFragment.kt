@@ -32,6 +32,7 @@ class PickAddressFragment : Fragment() {
     private lateinit var map: SupportMapFragment
     private val locationPermissionCode = 2
 
+    // FIXME check related comments in UserActivity, also - code duplication
     @SuppressLint("MissingPermission")
     private fun getLocation() {
         locationManager = getSystemService(
@@ -72,6 +73,11 @@ class PickAddressFragment : Fragment() {
             })
     }
 
+
+    // FIXME This code will not work on versions of Android below 33 due to the call to Geocoder.getFromLocation
+    //  you should either have a check for the current version (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU)
+    //  and provide the functionality only on newer
+    //  devices or use the deprecated blocking call with a coroutine launched in lifecycleScope
     @RequiresApi(Build.VERSION_CODES.TIRAMISU)
     override fun onCreateView(
         inflater: LayoutInflater,
@@ -99,6 +105,7 @@ class PickAddressFragment : Fragment() {
 
                         Log.d("ADDRESS", address)
 
+                        // FIXME have constants for all these keys
                         setFragmentResult(
                             "PICK_ADDRESS",
                             bundleOf(
