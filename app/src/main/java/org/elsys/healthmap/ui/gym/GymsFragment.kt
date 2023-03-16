@@ -5,7 +5,6 @@ import android.content.Intent
 import android.os.Bundle
 import android.view.*
 import androidx.fragment.app.Fragment
-import androidx.fragment.app.activityViewModels
 import androidx.fragment.app.viewModels
 import androidx.lifecycle.viewModelScope
 import androidx.navigation.fragment.findNavController
@@ -40,7 +39,7 @@ class GymsFragment : Fragment() {
         }
 
         val recyclerView = binding.gymsRecyclerView
-        val adapter = GymAdapter(gyms, requireContext().cacheDir, viewModel) {
+        val adapter = GymAdapter(gyms, requireContext().cacheDir, viewModel.viewModelScope) {
             val builder = AlertDialog.Builder(context)
 
             builder.apply {
@@ -73,7 +72,6 @@ class GymsFragment : Fragment() {
 
     override fun onCreateOptionsMenu(menu: Menu, inflater: MenuInflater) {
         inflater.inflate(R.menu.menu, menu)
-        super.onCreateOptionsMenu(menu, inflater)
     }
 
     override fun onOptionsItemSelected(item: MenuItem): Boolean {
@@ -82,7 +80,7 @@ class GymsFragment : Fragment() {
                 startActivity(Intent(context, AuthenticationActivity::class.java))
                 true
             }
-            else -> super.onOptionsItemSelected(item)
+            else -> false
         }
     }
 }

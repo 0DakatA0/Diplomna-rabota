@@ -60,8 +60,8 @@ class GymEditViewModel : ViewModel() {
         _photos.value = newPhotos
     }
 
-    suspend fun deletePhoto(photo: String, cacheDir: File) {
-        ImagesRepository.deleteImage(photo, cacheDir)
+    suspend fun deletePhoto(photo: String) {
+        ImagesRepository.deleteImage(photo)
 
         val newPhotos = _photos.value as MutableList<String>
         newPhotos.remove(photo)

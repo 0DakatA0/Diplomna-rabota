@@ -15,7 +15,7 @@ class UserViewModel : ViewModel() {
         get() = _gyms
 
 
-    fun getGyms(center: GeoLocation, radius: Double, filter: String) {
+    fun updateGyms(center: GeoLocation, radius: Double, filter: String) {
         GymsRepository.getGymsByLocation(center, radius) {
             if(filter.isNotEmpty()) {
                 _gyms.value = if (filter[0] == '#') {

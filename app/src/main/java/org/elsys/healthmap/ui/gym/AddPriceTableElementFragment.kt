@@ -32,6 +32,7 @@ class AddPriceTableElementFragment : Fragment() {
 
             if (product.isBlank()) {
                 binding.productName.error = "Product name is required"
+                return@setOnClickListener
             }
 
             if (price == null) {

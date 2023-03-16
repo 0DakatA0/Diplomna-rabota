@@ -14,21 +14,16 @@ import kotlinx.coroutines.tasks.await
 import org.elsys.healthmap.models.Gym
 
 class GymsRepository {
-    companion object{
+    companion object {
         private val db = FirebaseFirestore.getInstance()
         private val auth = Firebase.auth
 
-        fun getGyms(onSnapshotEvent: (Map<String, Gym>) -> Unit){
-            Log.d("GymsRepository", "getGyms: ${auth.currentUser?.uid}")
-
-            db.collection("gyms")
-                .whereEqualTo("owner", auth.currentUser?.uid!!)
+        fun getGyms(onSnapshotEvent: (Map<String, Gym>) -> Unit) {
+            db.collection("gyms").whereEqualTo("owner", auth.currentUser?.uid!!)
                 .addSnapshotListener { snapshot, _ ->
                     val gyms = mutableMapOf<String, Gym>()
 
-                    Log.d("GymsRepository", "getGyms: ${snapshot?.documents?.size}")
-
-                    for(doc in snapshot!!) {
+                    for (doc in snapshot!!) {
                         gyms[doc.id] = doc.toObject(Gym::class.java)
                     }
 
@@ -42,10 +37,11 @@ class GymsRepository {
             val bounds = GeoFireUtils.getGeoHashQueryBounds(center, radius)
             val tasks: MutableList<Task<QuerySnapshot>> = ArrayList()
             for (b in bounds) {
-                val q = db.collection("gyms")
-                    .orderBy("geohash")
-                    .startAt(b.startHash)
-                    .endAt(b.endHash)
+                val q =
+                    db.collection("gyms")
+                        .orderBy("geohash")
+                        .startAt(b.startHash)
+                        .endAt(b.endHash)
 
                 tasks.add(q.get())
             }
@@ -54,10 +50,10 @@ class GymsRepository {
             val gyms: MutableList<Gym> = mutableListOf()
 
             Tasks.whenAllComplete(tasks).addOnCompleteListener { results ->
-                for (task in results.result!!){
+                for (task in results.result!!) {
                     val snap = task.result as QuerySnapshot
                     for (doc in snap) {
-                        val coordinates  = doc.getGeoPoint("coordinates")
+                        val coordinates = doc.getGeoPoint("coordinates")
 
                         val lat = coordinates?.latitude!!
                         val lng = coordinates?.longitude!!
@@ -109,9 +105,9 @@ class GymsRepository {
                 .await()
                 .toObject(Gym::class.java)
 
-//            for (photo in gym?.photos!!) {
-//                ImagesRepository.deleteImage(photo)
-//            }
+            for (photo in gym?.photos!!) {
+                ImagesRepository.deleteImage(photo)
+            }
 
             db.collection("gyms")
                 .document(id)

@@ -41,13 +41,10 @@ class ImagesRepository {
             return imageName
         }
 
-        suspend fun deleteImage(image: String, cacheDir: File) {
+        suspend fun deleteImage(image: String) {
             val imageRef = storageRef.child(image)
-            val file = File(cacheDir, image)
 
             imageRef.delete().await()
-
-            file.delete()
         }
     }
 }

@@ -1,24 +1,22 @@
 package org.elsys.healthmap.ui.gym
 
-import android.content.Context
 import android.view.LayoutInflater
 import android.view.ViewGroup
 import androidx.core.net.toUri
 import androidx.lifecycle.LiveData
-import androidx.lifecycle.viewModelScope
 import androidx.navigation.findNavController
 import androidx.recyclerview.widget.RecyclerView
+import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.launch
 import org.elsys.healthmap.databinding.ItemGymBinding
 import org.elsys.healthmap.models.Gym
 import org.elsys.healthmap.repositories.ImagesRepository
-import org.elsys.healthmap.ui.viewmodels.GymsViewModel
 import java.io.File
 
 class GymAdapter (
     private val dataset: LiveData<Map<String, Gym>>,
     private val cacheDir: File,
-    private val viewModel: GymsViewModel,
+    private val scope: CoroutineScope,
     private val delete: (String) -> Unit
 ) : RecyclerView.Adapter<GymAdapter.GymViewHolder>() {
     class GymViewHolder(val binding: ItemGymBinding) : RecyclerView.ViewHolder(binding.root)
@@ -46,7 +44,7 @@ class GymAdapter (
         if (file != null && gym?.photos?.isNotEmpty() == true) {
             gym.photos[0].let {
                 if (!file.exists()) {
-                    viewModel.viewModelScope.launch {
+                    scope.launch {
                         ImagesRepository.getImage(it, file)
                         holder.binding.imageView.setImageURI(file.toUri())
                     }

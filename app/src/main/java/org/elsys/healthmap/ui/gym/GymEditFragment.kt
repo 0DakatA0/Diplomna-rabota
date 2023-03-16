@@ -39,7 +39,8 @@ class GymEditFragment : Fragment() {
                     gymEditViewModel.addPhoto(
                         uri,
                         requireContext().contentResolver,
-                        requireContext().cacheDir)
+                        requireContext().cacheDir
+                    )
                     isChanged = true
                 }
             }
@@ -59,7 +60,7 @@ class GymEditFragment : Fragment() {
             gymEditViewModel.viewModelScope
         ) {
             gymEditViewModel.viewModelScope.launch {
-                gymEditViewModel.deletePhoto(it, requireContext().cacheDir)
+                gymEditViewModel.deletePhoto(it)
             }
         }
 
