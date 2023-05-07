@@ -3,14 +3,13 @@ package org.elsys.healthmap.ui.gym
 import android.os.Bundle
 import android.text.Editable
 import android.text.TextWatcher
-import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import android.widget.Toast
 import androidx.activity.result.PickVisualMediaRequest
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.fragment.app.Fragment
-import androidx.fragment.app.activityViewModels
 import androidx.fragment.app.setFragmentResultListener
 import androidx.fragment.app.viewModels
 import androidx.lifecycle.lifecycleScope
@@ -20,13 +19,10 @@ import androidx.navigation.fragment.navArgs
 import com.firebase.geofire.GeoFireUtils
 import com.firebase.geofire.GeoLocation
 import com.google.firebase.firestore.GeoPoint
+import com.google.firebase.storage.StorageException
 import kotlinx.coroutines.launch
 import org.elsys.healthmap.databinding.FragmentGymEditBinding
-import org.elsys.healthmap.models.Gym
-import org.elsys.healthmap.repositories.GymsRepository
 import org.elsys.healthmap.ui.viewmodels.GymEditViewModel
-import org.elsys.healthmap.ui.viewmodels.GymsViewModel
-import java.io.File
 
 class GymEditFragment : Fragment() {
     private val gymEditViewModel: GymEditViewModel by viewModels()
@@ -34,6 +30,7 @@ class GymEditFragment : Fragment() {
     private val args: GymEditFragmentArgs by navArgs()
     private val pickMedia =
         registerForActivityResult(ActivityResultContracts.PickVisualMedia()) { uri ->
+//            val myUri = Uri.parse("content://media/picker/0/com.android.providers.media.photopicker/media/1980001135")
             if (uri != null) {
                 lifecycleScope.launch {
                     gymEditViewModel.addPhoto(
@@ -160,6 +157,16 @@ class GymEditFragment : Fragment() {
 
         setFragmentResultListener("ADD_PRICE_TABLE_ELEMENT") { _, bundle ->
             gymEditViewModel.addPriceTableElement(bundle)
+        }
+
+        gymEditViewModel.isUploadImageSuccessful.observe(viewLifecycleOwner) {
+            if(it == false) {
+                Toast.makeText(
+                    requireContext(),
+                    "Something went wrong",
+                    Toast.LENGTH_SHORT
+                ).show()
+            }
         }
 
         return binding.root

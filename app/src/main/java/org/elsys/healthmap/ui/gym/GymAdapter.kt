@@ -1,13 +1,17 @@
 package org.elsys.healthmap.ui.gym
 
+import android.util.Log
 import android.view.LayoutInflater
 import android.view.ViewGroup
 import androidx.core.net.toUri
 import androidx.lifecycle.LiveData
 import androidx.navigation.findNavController
+import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
+import com.google.firebase.storage.StorageException
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.launch
+import org.elsys.healthmap.R
 import org.elsys.healthmap.databinding.ItemGymBinding
 import org.elsys.healthmap.models.Gym
 import org.elsys.healthmap.repositories.ImagesRepository
@@ -17,8 +21,11 @@ class GymAdapter (
     private val dataset: LiveData<Map<String, Gym>>,
     private val cacheDir: File,
     private val scope: CoroutineScope,
-    private val delete: (String) -> Unit
+    private val onFail: (Int) -> Unit,
+    private val delete: (String) -> Unit,
 ) : RecyclerView.Adapter<GymAdapter.GymViewHolder>() {
+    private lateinit var layoutManager: LinearLayoutManager
+
     class GymViewHolder(val binding: ItemGymBinding) : RecyclerView.ViewHolder(binding.root)
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): GymViewHolder {
@@ -34,6 +41,7 @@ class GymAdapter (
         val id = element?.first
         val gym = element?.second
         holder.binding.gym = gym
+        holder.binding.imageView.setImageResource(R.drawable.ic_image_placeholder)
 
         val file = if(gym?.photos?.isNotEmpty() == true){
             File(cacheDir, gym.photos[0])
@@ -45,8 +53,18 @@ class GymAdapter (
             gym.photos[0].let {
                 if (!file.exists()) {
                     scope.launch {
-                        ImagesRepository.getImage(it, file)
-                        holder.binding.imageView.setImageURI(file.toUri())
+                        try {
+                            ImagesRepository.getImage(it, file)
+                            holder.binding.imageView.setImageURI(file.toUri())
+                        } catch (e: StorageException) {
+                            val firstVisible = layoutManager.findFirstVisibleItemPosition()
+                            val lastVisible = layoutManager.findLastVisibleItemPosition()
+
+                            if(position in firstVisible..lastVisible) {
+                                onFail(position)
+                            }
+                        }
+
                     }
                 } else {
                     holder.binding.imageView.setImageURI(file.toUri())
@@ -74,4 +92,9 @@ class GymAdapter (
     }
 
     override fun getItemCount() = dataset.value?.size ?: 0
+
+    override fun onAttachedToRecyclerView(recyclerView: RecyclerView) {
+        super.onAttachedToRecyclerView(recyclerView)
+        layoutManager = recyclerView.layoutManager as LinearLayoutManager
+    }
 }

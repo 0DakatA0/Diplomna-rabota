@@ -4,13 +4,13 @@ import com.google.firebase.firestore.GeoPoint
 
 data class Gym(
     var name: String,
-    var photos: MutableList<String>,
+    var photos: List<String>,
     var coordinates: GeoPoint,
     var address: String,
     var geohash: String,
     var description: String,
-    var tags: MutableList<String>,
-    var priceTable: MutableMap<String, Float>,
+    var tags: List<String>,
+    var priceTable: Map<String, Float>,
     var owner: String
 ) {
     constructor() : this(

@@ -1,6 +1,10 @@
 package org.elsys.healthmap.activities
 
 import android.Manifest
+import android.Manifest.permission.ACCESS_COARSE_LOCATION
+import android.Manifest.permission.ACCESS_FINE_LOCATION
+import android.annotation.SuppressLint
+import android.app.AlertDialog
 import android.content.Intent
 import android.content.pm.PackageManager
 import android.location.Location
@@ -14,6 +18,7 @@ import androidx.appcompat.widget.SearchView
 import androidx.core.app.ActivityCompat
 import androidx.core.content.ContextCompat
 import com.firebase.geofire.GeoLocation
+import com.google.android.gms.location.LocationServices
 import com.google.android.gms.maps.CameraUpdateFactory.newLatLngZoom
 import com.google.android.gms.maps.GoogleMap
 import com.google.android.gms.maps.OnMapReadyCallback
@@ -33,31 +38,59 @@ class UserActivity : AppCompatActivity(), OnMapReadyCallback {
     private lateinit var map: SupportMapFragment
     private val viewModel: UserViewModel by viewModels()
 
+    @SuppressLint("MissingPermission")
     private fun getLocation(map: GoogleMap) {
-        val locationManager = getSystemService(LOCATION_SERVICE) as LocationManager
+        val fusedLocationClient = LocationServices.getFusedLocationProviderClient(this)
 
+        fusedLocationClient.getCurrentLocation(
+            100, null
+        ).addOnSuccessListener { location: Location? ->
+            if (location != null) {
+                map.moveCamera(
+                    newLatLngZoom(
+                        LatLng(location.latitude, location.longitude), 16f
+                    )
+                )
+            }
+        }
+    }
+
+    private fun handleLocationPermissions(map: GoogleMap) {
         if (ContextCompat.checkSelfPermission(
-                this, Manifest.permission.ACCESS_FINE_LOCATION
+                this, ACCESS_FINE_LOCATION
+            ) == PackageManager.PERMISSION_GRANTED && ContextCompat.checkSelfPermission(
+                this, ACCESS_COARSE_LOCATION
             ) == PackageManager.PERMISSION_GRANTED
         ) {
-            locationManager.requestLocationUpdates(LocationManager.GPS_PROVIDER,
-                5000,
-                5f,
-                object : android.location.LocationListener {
-                    override fun onLocationChanged(location: Location) {
-                        map.moveCamera(
-                            newLatLngZoom(
-                                LatLng(location.latitude, location.longitude), 16f
-                            )
-                        )
+            getLocation(map)
+        } else {
+            val builder = AlertDialog.Builder(this)
+
+            builder.apply {
+                setPositiveButton("Grant Permission") { _, _ ->
+                    ActivityCompat.requestPermissions(
+                        this@UserActivity,
+                        arrayOf(
+                            ACCESS_FINE_LOCATION,
+                            ACCESS_COARSE_LOCATION
+                        ),
+                        2
+                    )
+
+                    if (ContextCompat.checkSelfPermission(
+                            this@UserActivity, ACCESS_FINE_LOCATION
+                        ) == PackageManager.PERMISSION_GRANTED && ContextCompat.checkSelfPermission(
+                            this@UserActivity, ACCESS_COARSE_LOCATION
+                        ) == PackageManager.PERMISSION_GRANTED
+                    ) {
+                        getLocation(map)
                     }
-
-                    override fun onStatusChanged(provider: String?, status: Int, extras: Bundle?) {}
-                    override fun onProviderEnabled(provider: String) {}
-                    override fun onProviderDisabled(provider: String) {}
-                })
+                }
+                setNegativeButton("No, Thanks") { _, _ -> }
+            }
+            builder.setMessage("Location permission is required to assist you in finding gyms near you. Would you like to grant it?")
+            builder.create().show()
         }
-
     }
 
     private fun calculateRadius(googleMap: GoogleMap): Double {
@@ -76,10 +109,10 @@ class UserActivity : AppCompatActivity(), OnMapReadyCallback {
 
         gyms.forEach { gym ->
             val markerOptions = MarkerOptions().position(
-                    LatLng(
-                        gym.coordinates.latitude, gym.coordinates.longitude
-                    )
-                ).title(gym.name)
+                LatLng(
+                    gym.coordinates.latitude, gym.coordinates.longitude
+                )
+            ).title(gym.name)
                 .icon(BitmapDescriptorFactory.defaultMarker(BitmapDescriptorFactory.HUE_AZURE))
 
             map.addMarker(markerOptions)?.tag = gym
@@ -107,12 +140,13 @@ class UserActivity : AppCompatActivity(), OnMapReadyCallback {
                 startActivity(Intent(this, AuthenticationActivity::class.java))
                 true
             }
+
             else -> super.onOptionsItemSelected(item)
         }
     }
 
     override fun onMapReady(map: GoogleMap) {
-        getLocation(map)
+        handleLocationPermissions(map)
         map.setMapStyle(MapStyleOptions(resources.getString(R.string.style_json)))
 
         viewModel.gyms.observe(this@UserActivity) { gyms ->
@@ -123,7 +157,6 @@ class UserActivity : AppCompatActivity(), OnMapReadyCallback {
 
         map.setPadding(0, searchBar.height + 30, 0, 0)
 
-        // Enable the compass on the map
         map.uiSettings.isCompassEnabled = true
 
         map.setOnMarkerClickListener { marker ->

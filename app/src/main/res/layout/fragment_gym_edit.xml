@@ -49,13 +49,16 @@
                 app:layout_constraintVertical_bias="0.0"
                 tools:listitem="@layout/item_gym_picture" />
 
-            <Button
+            <TextView
                 android:id="@+id/addPhotoButton"
                 android:layout_width="0dp"
-                android:layout_height="wrap_content"
                 android:layout_margin="15dp"
                 android:text="@string/add_photo"
-                android:textSize="30sp"
+                android:layout_height="50dp"
+                android:background="@drawable/button_gradient"
+                android:gravity="center"
+                android:textColor="@color/white"
+                android:textSize="20sp"
                 app:layout_constraintBottom_toBottomOf="parent"
                 app:layout_constraintEnd_toEndOf="parent"
                 app:layout_constraintHorizontal_bias="0.0"
@@ -64,13 +67,17 @@
                 app:layout_constraintVertical_bias="0.0"
                 />
 
-            <Button
+            <TextView
                 android:id="@+id/addressPickerNavigationButton"
                 android:layout_width="0dp"
-                android:layout_height="wrap_content"
                 android:layout_margin="15dp"
                 android:text="@{gym.address.empty ? @string/add_address : gym.address}"
-                android:textSize="30sp"
+                android:layout_height="wrap_content"
+                android:minHeight="50dp"
+                android:background="@drawable/button_gradient"
+                android:gravity="center"
+                android:textColor="@color/white"
+                android:textSize="20sp"
                 app:layout_constraintBottom_toBottomOf="parent"
                 app:layout_constraintEnd_toEndOf="parent"
                 app:layout_constraintHorizontal_bias="0.0"
@@ -122,19 +129,22 @@
                 app:layoutManager="androidx.recyclerview.widget.LinearLayoutManager"
                 app:layout_constraintBottom_toBottomOf="parent"
                 app:layout_constraintEnd_toEndOf="parent"
-                app:layout_constraintHorizontal_bias="1.0"
+                app:layout_constraintHorizontal_bias="0.448"
                 app:layout_constraintStart_toStartOf="parent"
                 app:layout_constraintTop_toBottomOf="@+id/tagsField"
                 app:layout_constraintVertical_bias="0.0"
                 tools:listitem="@layout/item_price_table" />
 
-            <Button
+            <TextView
                 android:id="@+id/addToPriceTableButton"
                 android:layout_width="match_parent"
-                android:layout_height="wrap_content"
                 android:layout_margin="15dp"
                 android:text="@string/add_to_price_table"
-                android:textSize="30sp"
+                android:layout_height="50dp"
+                android:background="@drawable/button_gradient"
+                android:gravity="center"
+                android:textColor="@color/white"
+                android:textSize="20sp"
                 app:layout_constraintBottom_toBottomOf="parent"
                 app:layout_constraintEnd_toEndOf="parent"
                 app:layout_constraintStart_toStartOf="parent"
