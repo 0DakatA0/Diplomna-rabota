@@ -6,6 +6,7 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import androidx.fragment.app.Fragment
+import androidx.lifecycle.Lifecycle
 import com.google.firebase.auth.ktx.auth
 import com.google.firebase.ktx.Firebase
 import org.elsys.healthmap.activities.GymOwnerActivity
@@ -50,7 +51,9 @@ class SignUpFragment : Fragment() {
             }
 
             auth.createUserWithEmailAndPassword(email, password).addOnSuccessListener {
-                startActivity(Intent(context, GymOwnerActivity::class.java))
+                if(this@SignUpFragment.lifecycle.currentState == Lifecycle.State.RESUMED){
+                    startActivity(Intent(context, GymOwnerActivity::class.java))
+                }
             }
         }
 

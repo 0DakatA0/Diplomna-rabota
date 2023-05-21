@@ -3,7 +3,6 @@ package org.elsys.healthmap.ui.gym
 import android.app.AlertDialog
 import android.content.Intent
 import android.os.Bundle
-import android.util.Log
 import android.view.*
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.viewModels
@@ -17,12 +16,13 @@ import org.elsys.healthmap.R
 import org.elsys.healthmap.activities.AuthenticationActivity
 import org.elsys.healthmap.databinding.FragmentGymsBinding
 import org.elsys.healthmap.models.Gym
-import org.elsys.healthmap.repositories.ImagesRepository
 import org.elsys.healthmap.ui.viewmodels.GymsViewModel
+import org.elsys.healthmap.ui.viewmodels.ImageFailureViewModel
 import java.util.*
 
 class GymsFragment : Fragment() {
     private val viewModel: GymsViewModel by viewModels()
+    private val imageFailureViewModel: ImageFailureViewModel by viewModels()
 
     override fun onCreateView(
         inflater: LayoutInflater,
@@ -49,7 +49,7 @@ class GymsFragment : Fragment() {
             requireContext().cacheDir,
             viewModel.viewModelScope,
             {
-                viewModel.addFailedImage(it)
+                imageFailureViewModel.addFailedImage(it)
             }
         ) {
             val builder = AlertDialog.Builder(context)
@@ -74,29 +74,14 @@ class GymsFragment : Fragment() {
             adapter.notifyDataSetChanged()
         }
 
-        viewModel.hasFailed.observe(viewLifecycleOwner) {
+        imageFailureViewModel.hasImageDownloadFailed.observe(viewLifecycleOwner) {
             if (it) {
                 val floatingActionButton = requireActivity().findViewById<View>(R.id.addGymButton)
-
-                Snackbar.make(
+                imageFailureViewModel.showSnackBarMessage(
                     requireView(),
-                    R.string.snackbar_unable_to_download,
-                    Snackbar.LENGTH_LONG
+                    floatingActionButton,
+                    adapter
                 )
-                    .setAction(R.string.retry) {
-                        if(viewModel.failedImagePositions.value.isNullOrEmpty()) {
-                            return@setAction
-                        } else {
-                            for (imagePosition in viewModel.failedImagePositions.value!!) {
-                                adapter.notifyItemChanged(imagePosition)
-                            }
-
-                            viewModel.clearFailedImages()
-                        }
-                    }
-                    .setAnchorView(floatingActionButton)
-                    .show()
-
             }
         }
 

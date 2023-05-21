@@ -11,12 +11,17 @@
         android:layout_width="match_parent"
         android:layout_height="match_parent"/>
 
-    <Button
+    <TextView
         android:id="@+id/pickAddressButton"
         android:layout_width="match_parent"
-        android:layout_height="wrap_content"
         android:layout_margin="15dp"
         android:text="@string/pick_address"
+        android:layout_height="wrap_content"
+        android:minHeight="50dp"
+        android:background="@drawable/button_gradient"
+        android:gravity="center"
+        android:textColor="@color/white"
+        android:textSize="20sp"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintHorizontal_bias="1.0"

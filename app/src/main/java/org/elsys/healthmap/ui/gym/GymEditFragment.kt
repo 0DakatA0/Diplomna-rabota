@@ -18,22 +18,24 @@ import androidx.navigation.fragment.findNavController
 import androidx.navigation.fragment.navArgs
 import com.firebase.geofire.GeoFireUtils
 import com.firebase.geofire.GeoLocation
+import com.google.android.material.snackbar.Snackbar
 import com.google.firebase.firestore.GeoPoint
-import com.google.firebase.storage.StorageException
 import kotlinx.coroutines.launch
+import org.elsys.healthmap.R
 import org.elsys.healthmap.databinding.FragmentGymEditBinding
 import org.elsys.healthmap.ui.viewmodels.GymEditViewModel
+import org.elsys.healthmap.ui.viewmodels.ImageFailureViewModel
 
 class GymEditFragment : Fragment() {
-    private val gymEditViewModel: GymEditViewModel by viewModels()
+    private val viewModel: GymEditViewModel by viewModels()
+    private val imageFailureViewModel: ImageFailureViewModel by viewModels()
     private var isChanged = false
     private val args: GymEditFragmentArgs by navArgs()
     private val pickMedia =
         registerForActivityResult(ActivityResultContracts.PickVisualMedia()) { uri ->
-//            val myUri = Uri.parse("content://media/picker/0/com.android.providers.media.photopicker/media/1980001135")
             if (uri != null) {
                 lifecycleScope.launch {
-                    gymEditViewModel.addPhoto(
+                    viewModel.addPhoto(
                         uri,
                         requireContext().contentResolver,
                         requireContext().cacheDir
@@ -49,19 +51,22 @@ class GymEditFragment : Fragment() {
         savedInstanceState: Bundle?
     ): View {
         val binding = FragmentGymEditBinding.inflate(inflater, container, false)
-        gymEditViewModel.gymId = args.id
+        viewModel.gymId = args.id
 
         val adapter = GymImagesAdapter(
-            gymEditViewModel.photos,
+            viewModel.photos,
             requireContext().cacheDir,
-            gymEditViewModel.viewModelScope
+            viewModel.viewModelScope,
+            {
+                imageFailureViewModel.addFailedImage(it)
+            }
         ) {
-            gymEditViewModel.viewModelScope.launch {
-                gymEditViewModel.deletePhoto(it)
+            viewModel.viewModelScope.launch {
+                viewModel.deletePhoto(it)
             }
         }
 
-        gymEditViewModel.photos.observe(viewLifecycleOwner) {
+        viewModel.photos.observe(viewLifecycleOwner) {
             adapter.notifyDataSetChanged()
         }
 
@@ -69,9 +74,9 @@ class GymEditFragment : Fragment() {
         gymImagesRecyclerView.adapter = adapter
         gymImagesRecyclerView.setHasFixedSize(false)
 
-        gymEditViewModel.gym.observe(viewLifecycleOwner) {
-            binding.gym = gymEditViewModel.gym.value
-            binding.tags = gymEditViewModel.gym.value?.tags?.joinToString(", ")
+        viewModel.gym.observe(viewLifecycleOwner) {
+            binding.gym = viewModel.gym.value
+            binding.tags = viewModel.gym.value?.tags?.joinToString(", ")
         }
 
         binding.addressPickerNavigationButton.setOnClickListener {
@@ -87,20 +92,20 @@ class GymEditFragment : Fragment() {
             val hash = GeoFireUtils.getGeoHashForLocation(GeoLocation(lat, lng))
 
             if (address != null) {
-                gymEditViewModel.gym.value?.address = address
+                viewModel.gym.value?.address = address
             }
-            gymEditViewModel.gym.value?.geohash = hash
-            gymEditViewModel.gym.value?.coordinates = GeoPoint(lat, lng)
+            viewModel.gym.value?.geohash = hash
+            viewModel.gym.value?.coordinates = GeoPoint(lat, lng)
             isChanged = true
         }
 
         val priceTable = binding.priceTableRecyclerView
-        val priceTableDataset = gymEditViewModel.priceTable
+        val priceTableDataset = viewModel.priceTable
         priceTable.adapter = GymEditPriceTableAdapter(priceTableDataset) { product ->
-            gymEditViewModel.deletePriceTableElement(product)
+            viewModel.deletePriceTableElement(product)
         }
 
-        gymEditViewModel.priceTable.observe(viewLifecycleOwner) {
+        viewModel.priceTable.observe(viewLifecycleOwner) {
             priceTable.adapter?.notifyDataSetChanged()
         }
 
@@ -112,7 +117,7 @@ class GymEditFragment : Fragment() {
 
         binding.gymName.addTextChangedListener(object : TextWatcher {
             override fun afterTextChanged(s: Editable?) {
-                gymEditViewModel.gym.value?.name = s.toString()
+                viewModel.gym.value?.name = s.toString()
                 isChanged = true
             }
 
@@ -125,7 +130,7 @@ class GymEditFragment : Fragment() {
 
         binding.tagsField.addTextChangedListener(object : TextWatcher {
             override fun afterTextChanged(s: Editable?) {
-                gymEditViewModel.gym.value?.tags = s.toString().split(", ") as MutableList<String>
+                viewModel.gym.value?.tags = s.toString().split(", ") as MutableList<String>
                 isChanged = true
             }
 
@@ -138,7 +143,7 @@ class GymEditFragment : Fragment() {
 
         binding.description.addTextChangedListener(object : TextWatcher {
             override fun afterTextChanged(s: Editable?) {
-                gymEditViewModel.gym.value?.description = s.toString()
+                viewModel.gym.value?.description = s.toString()
                 isChanged = true
             }
 
@@ -156,10 +161,10 @@ class GymEditFragment : Fragment() {
         }
 
         setFragmentResultListener("ADD_PRICE_TABLE_ELEMENT") { _, bundle ->
-            gymEditViewModel.addPriceTableElement(bundle)
+            viewModel.addPriceTableElement(bundle)
         }
 
-        gymEditViewModel.isUploadImageSuccessful.observe(viewLifecycleOwner) {
+        viewModel.isUploadImageSuccessful.observe(viewLifecycleOwner) {
             if(it == false) {
                 Toast.makeText(
                     requireContext(),
@@ -169,15 +174,25 @@ class GymEditFragment : Fragment() {
             }
         }
 
+        imageFailureViewModel.hasImageDownloadFailed.observe(viewLifecycleOwner) {
+            if (it) {
+                imageFailureViewModel.showSnackBarMessage(
+                    binding.root,
+                    binding.root,
+                    adapter
+                )
+            }
+        }
+
         return binding.root
     }
 
     override fun onStop() {
         super.onStop()
 
-        gymEditViewModel.viewModelScope.launch {
+        viewModel.viewModelScope.launch {
             if (isChanged) {
-                gymEditViewModel.saveGym()
+                viewModel.saveGym()
                 isChanged = false
             }
         }

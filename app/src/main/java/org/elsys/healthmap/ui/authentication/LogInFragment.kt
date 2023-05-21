@@ -7,6 +7,7 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import androidx.fragment.app.Fragment
+import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.lifecycleScope
 import androidx.navigation.fragment.findNavController
 import com.google.firebase.auth.ktx.auth
@@ -42,7 +43,9 @@ class LogInFragment : Fragment() {
                 }
 
                 auth.signInWithEmailAndPassword(email, password).addOnSuccessListener {
-                    startActivity(Intent(context, GymOwnerActivity::class.java))
+                    if(this@LogInFragment.lifecycle.currentState == Lifecycle.State.RESUMED){
+                        startActivity(Intent(context, GymOwnerActivity::class.java))
+                    }
                 }.addOnFailureListener {
                     if(it.message!!.contains("password")) {
                         binding.logInPassword.error = "Wrong password"

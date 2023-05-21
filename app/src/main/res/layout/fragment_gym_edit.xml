@@ -123,9 +123,10 @@
 
             <androidx.recyclerview.widget.RecyclerView
                 android:id="@+id/priceTableRecyclerView"
+                android:orientation="horizontal"
                 android:layout_width="0dp"
                 android:layout_height="wrap_content"
-                android:layout_margin="15dp"
+                android:layout_marginVertical="15dp"
                 app:layoutManager="androidx.recyclerview.widget.LinearLayoutManager"
                 app:layout_constraintBottom_toBottomOf="parent"
                 app:layout_constraintEnd_toEndOf="parent"

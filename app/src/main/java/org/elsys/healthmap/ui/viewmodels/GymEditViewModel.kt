@@ -47,7 +47,7 @@ class GymEditViewModel : ViewModel() {
     val isUploadImageSuccessful: LiveData<Boolean>
         get() = _isUploadImageSuccessful
 
-    fun setIsUploadImageSuccessful(value: Boolean) {
+    private fun setIsUploadImageSuccessful(value: Boolean) {
         if(value != _isUploadImageSuccessful.value) {
             _isUploadImageSuccessful.value = value
         }

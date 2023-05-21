@@ -5,6 +5,8 @@ import android.view.ViewGroup
 import androidx.lifecycle.LiveData
 import androidx.recyclerview.widget.RecyclerView
 import org.elsys.healthmap.databinding.ItemPriceTableBinding
+import java.math.BigDecimal
+import java.text.DecimalFormat
 
 class GymEditPriceTableAdapter(
     private val dataset: LiveData<Map<String, Float>>,
@@ -26,7 +28,9 @@ class GymEditPriceTableAdapter(
         val item = dataset.value?.toList()?.get(position)
         if (item != null) {
             holder.binding.product = item.first
-            holder.binding.price = item.second.toString()
+
+            val decimalFormat = DecimalFormat("0.00")
+            holder.binding.price = decimalFormat.format(item.second) + " лв."
         }
 
         holder.binding.root.setOnLongClickListener {

@@ -15,6 +15,7 @@ import org.elsys.healthmap.models.Gym
 import org.elsys.healthmap.ui.gym.GymEditPriceTableAdapter
 import org.elsys.healthmap.ui.gym.GymImagesAdapter
 import org.elsys.healthmap.ui.viewmodels.BottomSheetViewModel
+import org.elsys.healthmap.ui.viewmodels.ImageFailureViewModel
 import org.elsys.healthmap.ui.viewmodels.UserViewModel
 
 class BottomSheetGymFragment(
@@ -24,6 +25,7 @@ class BottomSheetGymFragment(
         const val TAG = "ModalBottomSheet"
     }
     private val viewModel: BottomSheetViewModel by viewModels()
+    private val imageFailureViewModel: ImageFailureViewModel by viewModels()
 
     override fun onCreateView(
         inflater: LayoutInflater,
@@ -41,8 +43,21 @@ class BottomSheetGymFragment(
         val imagesAdapter = GymImagesAdapter(
             photos,
             requireContext().cacheDir,
-            viewModel.viewModelScope
+            viewModel.viewModelScope,
+            {
+                imageFailureViewModel.addFailedImage(it)
+            }
         ) {}
+
+        imageFailureViewModel.hasImageDownloadFailed.observe(viewLifecycleOwner) {
+            if (it) {
+                imageFailureViewModel.showSnackBarMessage(
+                    binding.root,
+                    binding.root,
+                    imagesAdapter
+                )
+            }
+        }
 
         binding.gymImagesRecyclerViewBottomSheet.adapter = imagesAdapter
         binding.gymImagesRecyclerViewBottomSheet.setHasFixedSize(true)
