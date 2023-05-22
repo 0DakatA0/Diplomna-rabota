@@ -155,9 +155,7 @@ class UserActivity : AppCompatActivity(), OnMapReadyCallback {
 
         val searchBar = findViewById<SearchView>(R.id.searchBar)
 
-        map.setPadding(0, searchBar.height + 30, 0, 0)
-
-        map.uiSettings.isCompassEnabled = true
+        map.uiSettings.isCompassEnabled = false
 
         map.setOnMarkerClickListener { marker ->
             val modalBottomSheet = BottomSheetGymFragment(marker.tag as Gym)
